@@ -6,12 +6,16 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProjectsController;
+use App\Http\Controllers\QuoteRequestAttachmentController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'root'])->name('root');
 Route::get('/index.html', [RedirectController::class, 'rootIndex'])->name('legacy.root-index');
+
+Route::get('/'.config('energea.admin_path').'/quote-requests/{quoteRequest}/attachment', [QuoteRequestAttachmentController::class, 'download'])
+    ->name('admin.quote-requests.attachment');
 
 Route::prefix('{locale}')
     ->whereIn('locale', config('energea.locales'))
@@ -28,6 +32,8 @@ Route::prefix('{locale}')
         Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
         Route::get('/certificates', [CertificatesController::class, 'index'])->name('certificates');
         Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+        Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1')->name('contact.store');
+        Route::get('/contact/captcha', [ContactController::class, 'captcha'])->middleware('throttle:30,1')->name('contact.captcha');
 
         Route::get('/index.html', [RedirectController::class, 'index'])->name('legacy.index');
         Route::get('/service.html', [RedirectController::class, 'service'])->name('legacy.service');

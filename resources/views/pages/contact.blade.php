@@ -39,8 +39,27 @@
                     </article>
                 </div>
                 <div class="col-lg-8">
-                    <form class="form-shell reveal quote-form" id="contactForm" method="post" enctype="multipart/form-data">
+                    <form class="form-shell reveal quote-form" id="contactForm" method="post" action="{{ route('contact.store') }}" enctype="multipart/form-data"
+                        data-message-success="{{ __('contact.messages.success') }}"
+                        data-message-error="{{ __('contact.messages.error') }}"
+                        data-message-captcha="{{ __('contact.messages.invalid_captcha') }}">
                         @csrf
+                        <input type="hidden" name="form_ts" id="formTs" value="{{ session('quote_form_ts') ?? time() }}">
+                        <input type="hidden" name="locale" value="{{ app()->getLocale() }}">
+                        @if (session('quote_status'))
+                            <div class="alert {{ session('quote_status') === 'success' ? 'alert-success' : 'alert-danger' }} form-status" role="status" aria-live="polite">
+                                {{ session('quote_message') }}
+                            </div>
+                        @endif
+                        @if ($errors->any())
+                            <div class="alert alert-danger form-status" role="alert">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="form-heading">
                             <span class="section-label">{{ __('contact.form_label') }}</span>
                             <h2>{{ __('contact.form_title') }}</h2>
@@ -112,6 +131,7 @@
                                         </div>
                                         <button type="button" class="verification-refresh" id="refreshCaptcha" aria-label="{{ __('contact.new_question') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 11a8 8 0 1 0-1.5 5"></path><path d="M20 4v7h-7"></path></svg><span>{{ __('contact.new_question') }}</span></button>
                                     </div>
+                                    <div id="captchaError" class="alert alert-danger form-status d-none" role="alert" aria-live="polite"></div>
                                 </fieldset>
                             </div>
                             <div class="col-12">

@@ -44,6 +44,16 @@ return [
     'new_question' => 'New question',
     'submit' => 'Submit quote request',
 
+    'messages' => [
+        'success' => 'Your quote request has been sent. Our team will review it and get back to you.',
+        'error' => 'We could not send your request. Please try again or email us directly.',
+        'rate_limited' => 'Too many requests. Please try again in a moment.',
+        'too_fast' => 'Please take a moment to review the form before submitting.',
+        'invalid_captcha' => 'The verification answer is incorrect. Please try again.',
+        'invalid_file' => 'The attachment is not allowed or exceeds the size limit.',
+        'honeypot' => 'Your request could not be submitted.',
+    ],
+
     'cities' => [
         'riyadh' => 'Riyadh',
         'jeddah' => 'Jeddah',

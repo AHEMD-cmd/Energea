@@ -163,7 +163,7 @@
     });
   }
 
-  // The form toggles location fields and shows the selected attachment name.
+  // The form validates the captcha locally and submits without a page reload.
   function form() {
     const form = document.getElementById("contactForm");
     if (!form) return;
@@ -174,30 +174,25 @@
     const otherInput = document.getElementById("otherLocation");
     const attachmentInput = form.elements.attachment;
     const selectedFileName = document.getElementById("selectedFileName");
-
-    attachmentInput?.addEventListener("change", () => {
-      if (selectedFileName)
-        selectedFileName.textContent =
-          attachmentInput.files?.[0]?.name || t("No file selected", "لم يتم اختيار ملف");
-    });
-
-    const refreshCaptcha = () => {
-      const first = Math.floor(Math.random() * 7) + 2;
-      const second = Math.floor(Math.random() * 7) + 1;
-      if (question)
-        question.textContent = t(
-          `Please enter the result of ${first} + ${second}`,
-          `من فضلك اكتب ناتج ${first} + ${second}`,
-        );
-      if (answer) answer.value = "";
+    const refreshButton = document.getElementById("refreshCaptcha");
+    const captchaError = document.getElementById("captchaError");
+    const formMessage = document.getElementById("formMessage");
+    const submitButton = form.querySelector('button[type="submit"]');
+    const captchaUrl = document.documentElement.lang === "ar" ? "/ar/contact/captcha" : "/en/contact/captcha";
+    const messages = {
+      success: form.dataset.messageSuccess || "",
+      error: form.dataset.messageError || "",
+      captcha: form.dataset.messageCaptcha || "",
     };
 
-    refreshCaptcha();
-    const refreshButton = document.getElementById("refreshCaptcha");
-    if (refreshButton) {
-      refreshButton.setAttribute("aria-label", t("New question", "سؤال جديد"));
-      refreshButton.addEventListener("click", refreshCaptcha);
-    }
+    const showStatus = (element, text, variant) => {
+      if (!element) return;
+      element.textContent = text || "";
+      element.classList.remove("alert-danger", "alert-success");
+      element.classList.toggle("d-none", !text);
+      if (text) element.classList.add(variant);
+    };
+
     const updateLocation = () => {
       const custom = locationSelect?.value === "other";
       if (otherGroup) otherGroup.hidden = !custom;
@@ -206,8 +201,83 @@
         if (!custom) otherInput.value = "";
       }
     };
+
+    const refreshCaptcha = async () => {
+      if (answer) answer.value = "";
+      try {
+        const response = await fetch(captchaUrl, {
+          headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (question && data.question) {
+          question.textContent = data.question;
+        }
+      } catch (error) {
+        // The server keeps validating the answer when the question cannot be loaded.
+      }
+    };
+
+    attachmentInput?.addEventListener("change", () => {
+      if (selectedFileName)
+        selectedFileName.textContent =
+          attachmentInput.files?.[0]?.name || t("No file selected", "لم يتم اختيار ملف");
+    });
+
+    refreshCaptcha();
+    if (refreshButton) {
+      refreshButton.setAttribute("aria-label", t("New question", "سؤال جديد"));
+      refreshButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        showStatus(captchaError, "", "alert-danger");
+        refreshCaptcha();
+      });
+    }
+    answer?.addEventListener("input", () => showStatus(captchaError, "", "alert-danger"));
     locationSelect?.addEventListener("change", updateLocation);
     updateLocation();
+
+    const submitQuote = async () => {
+      if (submitButton) submitButton.disabled = true;
+      showStatus(formMessage, "", "alert-danger");
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" },
+        });
+        const payload = await response.json().catch(() => ({}));
+        const firstError = payload.errors ? Object.values(payload.errors)[0]?.[0] : "";
+
+        if (response.ok && payload.status === "ok") {
+          showStatus(formMessage, payload.message || messages.success, "alert-success");
+          form.reset();
+          updateLocation();
+          showStatus(captchaError, "", "alert-danger");
+          refreshCaptcha();
+          return;
+        }
+
+        showStatus(
+          formMessage,
+          payload.message || firstError || messages.error,
+          "alert-danger",
+        );
+        if (payload.key === "invalid_captcha") {
+          showStatus(captchaError, payload.message || messages.captcha, "alert-danger");
+          refreshCaptcha();
+        }
+      } catch (error) {
+        showStatus(formMessage, messages.error, "alert-danger");
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submitQuote();
+    });
   }
 
   // Layout and interactions initialize after the document is ready.

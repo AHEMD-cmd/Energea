@@ -7,7 +7,6 @@ use App\Models\QuoteRequest;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Storage;
 
 class QuoteRequestInfolist
 {
@@ -45,9 +44,9 @@ class QuoteRequestInfolist
                         TextEntry::make('attachment_path')
                             ->label('Attachment')
                             ->placeholder('—')
-                            ->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '—')
+                            ->formatStateUsing(fn (?string $state, QuoteRequest $record): string => $record->attachment_original_name ?: ($state ? basename($state) : '—'))
                             ->url(fn (QuoteRequest $record): ?string => $record->attachment_path
-                                ? Storage::disk('public')->url($record->attachment_path)
+                                ? route('admin.quote-requests.attachment', $record)
                                 : null)
                             ->openUrlInNewTab(),
                     ])
