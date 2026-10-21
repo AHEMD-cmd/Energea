@@ -12,24 +12,24 @@ use Filament\Schemas\Components\Tabs\Tab;
 class Bilingual
 {
     /**
-     * @param  array<string, Closure(string): Component>  $fields
+     * @param  array<string, Closure(string, string): Component>  $fields
      */
-    public static function tabs(array $fields): Tabs
+    public static function tabs(array $fields, string $prefix = ''): Tabs
     {
-        return Tabs::make('translations')
+        return Tabs::make($prefix !== '' ? "{$prefix}-translations" : 'translations')
             ->tabs([
                 Tab::make('English')
-                    ->schema(self::localize($fields, 'en')),
+                    ->schema(self::localize($fields, 'en', $prefix)),
                 Tab::make('العربية')
-                    ->schema(self::localize($fields, 'ar')),
+                    ->schema(self::localize($fields, 'ar', $prefix)),
             ])
             ->columnSpanFull();
     }
 
     public static function text(string $name, string $label, bool $required = false, int $maxLength = 255): Closure
     {
-        return function (string $locale) use ($name, $label, $required, $maxLength): TextInput {
-            return TextInput::make("{$name}.{$locale}")
+        return function (string $locale, string $prefix = '') use ($name, $label, $required, $maxLength): TextInput {
+            return TextInput::make(self::name($name, $locale, $prefix))
                 ->label($label)
                 ->required($required)
                 ->maxLength($maxLength)
@@ -39,8 +39,8 @@ class Bilingual
 
     public static function textarea(string $name, string $label, bool $required = false, int $rows = 4): Closure
     {
-        return function (string $locale) use ($name, $label, $required, $rows): Textarea {
-            return Textarea::make("{$name}.{$locale}")
+        return function (string $locale, string $prefix = '') use ($name, $label, $required, $rows): Textarea {
+            return Textarea::make(self::name($name, $locale, $prefix))
                 ->label($label)
                 ->required($required)
                 ->rows($rows)
@@ -49,15 +49,22 @@ class Bilingual
     }
 
     /**
-     * @param  array<string, Closure(string): Component>  $fields
+     * @param  array<string, Closure(string, string): Component>  $fields
      * @return array<int, Component>
      */
-    private static function localize(array $fields, string $locale): array
+    private static function localize(array $fields, string $locale, string $prefix): array
     {
         return array_values(array_map(
-            fn (Closure $factory): Component => $factory($locale),
+            fn (Closure $factory): Component => $factory($locale, $prefix),
             $fields,
         ));
+    }
+
+    private static function name(string $name, string $locale, string $prefix): string
+    {
+        $path = $prefix !== '' ? "{$prefix}.{$name}" : $name;
+
+        return "{$path}.{$locale}";
     }
 
     /**

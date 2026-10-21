@@ -3,8 +3,11 @@
 namespace App\Filament\Resources\Projects\Schemas;
 
 use App\Filament\Support\Bilingual;
+use App\Models\Project;
 use App\Models\Sector;
+use App\Support\Media;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -39,16 +42,32 @@ class ProjectForm
                             ->required(),
                         Toggle::make('is_published')
                             ->default(true),
-                        FileUpload::make('image')
+                        Placeholder::make('current_image')
+                            ->label('Current image')
+                            ->content(function (?Project $record) {
+                                $image = $record?->image;
+
+                                return view('filament.forms.image-preview', [
+                                    'url' => filled($image) ? Media::url($image) : null,
+                                    'isCustom' => filled($image),
+                                    'title' => 'Project image',
+                                    'hint' => 'Landscape image recommended.',
+                                    'variant' => 'landscape',
+                                ]);
+                            })
+                            ->columnSpanFull(),
+                        FileUpload::make('image_upload')
+                            ->label('Upload image')
+                            ->helperText('Upload a new image to replace the current one.')
                             ->image()
                             ->disk('public')
                             ->directory('projects')
                             ->visibility('public')
                             ->maxSize(5120)
-                            ->columnSpanFull()
-                            ->required(),
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columnSpanFull(),
                 Bilingual::tabs([
                     'title' => Bilingual::text('title', 'Title', required: true),
                     'location' => Bilingual::text('location', 'Location', required: true),

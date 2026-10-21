@@ -2,7 +2,7 @@
 <!doctype html>
 <html lang="{{ app()->getLocale() }}" dir="{{ $isRtl ? 'rtl' : 'ltr' }}">
 <head>
-@include('partials.head', ['seo' => $seo, 'isRtl' => $isRtl, 'page' => $page ?? null])
+@include('partials.head', ['seo' => $seo, 'isRtl' => $isRtl, 'page' => $page ?? null, 'preloadImage' => $preloadImage ?? null])
 </head>
 <body data-page="{{ $page ?? '' }}" data-language="{{ app()->getLocale() }}"@if (! empty($bodyClass ?? null)) class="{{ $bodyClass }}"@endif>
 <div id="siteHeader">@include('partials.header', ['isRtl' => $isRtl])</div>

@@ -4,12 +4,12 @@ namespace App\Filament\Resources\Projects\RelationManagers;
 
 use App\Enums\PartyType;
 use App\Filament\Support\Bilingual;
+use App\Filament\Support\ImageUpload;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
@@ -35,13 +35,7 @@ class PartiesRelationManager extends RelationManager
                                 ->mapWithKeys(fn (PartyType $type): array => [$type->value => $type->label()])
                                 ->all())
                             ->required(),
-                        FileUpload::make('logo')
-                            ->image()
-                            ->disk('public')
-                            ->directory('projects/parties')
-                            ->visibility('public')
-                            ->maxSize(5120)
-                            ->required(),
+                        ImageUpload::make('logo', 'projects/parties'),
                         Bilingual::tabs([
                             'name' => Bilingual::text('name', 'Name', required: true),
                         ]),

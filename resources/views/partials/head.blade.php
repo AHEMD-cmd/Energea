@@ -22,7 +22,7 @@
     <meta name="description" content="{{ $seo['description'] }}">
     <title>{{ $seo['title'] }}</title>
     @if (($page ?? null) === 'home')
-        <link rel="preload" href="{{ asset('assets/images/field-panel-desktop.jpeg') }}" as="image" fetchpriority="high">
+        <link rel="preload" href="{{ $preloadImage ?? asset('assets/images/field-panel-desktop.jpeg') }}" as="image" fetchpriority="high">
     @elseif ($isRtl)
         <link rel="preload" href="{{ asset('assets/fonts/tajawal-400.woff2') }}" as="font" type="font/woff2" crossorigin>
     @else

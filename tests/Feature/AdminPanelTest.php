@@ -50,6 +50,9 @@ class AdminPanelTest extends TestCase
         $this->get('/admin/certificates')->assertOk();
         $this->get('/admin/sectors')->assertOk();
         $this->get('/admin/quote-requests')->assertOk();
+        $this->get('/admin/manage-home-page')->assertOk();
+        $this->get('/admin/manage-about-page')->assertOk();
+        $this->get('/admin/manage-services-page')->assertOk();
         $this->get('/admin/manage-site-settings')->assertOk();
 
         $service = Service::query()->firstOrFail();

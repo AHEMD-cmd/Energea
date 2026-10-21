@@ -3,7 +3,10 @@
 namespace App\Filament\Resources\Services\Schemas;
 
 use App\Filament\Support\Bilingual;
+use App\Models\Service;
+use App\Support\Media;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -34,16 +37,32 @@ class ServiceForm
                             ->required(),
                         Toggle::make('is_published')
                             ->default(true),
-                        FileUpload::make('image')
+                        Placeholder::make('current_image')
+                            ->label('Current image')
+                            ->content(function (?Service $record) {
+                                $image = $record?->image;
+
+                                return view('filament.forms.image-preview', [
+                                    'url' => filled($image) ? Media::url($image) : null,
+                                    'isCustom' => filled($image),
+                                    'title' => 'Service image',
+                                    'hint' => 'Landscape image recommended.',
+                                    'variant' => 'landscape',
+                                ]);
+                            })
+                            ->columnSpanFull(),
+                        FileUpload::make('image_upload')
+                            ->label('Upload image')
+                            ->helperText('Upload a new image to replace the current one.')
                             ->image()
                             ->disk('public')
                             ->directory('services')
                             ->visibility('public')
                             ->maxSize(5120)
-                            ->columnSpanFull()
-                            ->required(),
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columnSpanFull(),
                 Bilingual::tabs([
                     'title' => Bilingual::text('title', 'Title', required: true),
                     'type' => Bilingual::text('type', 'Type', required: true),

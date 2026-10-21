@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PageContent;
 use App\Models\Service;
+use App\Support\Media;
 use App\Support\Seo;
+use App\Support\ServicesContent;
 use Illuminate\Contracts\View\View;
 
 class ServicesController extends Controller
@@ -15,10 +18,14 @@ class ServicesController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $content = PageContent::localized(ServicesContent::PAGE);
+
         return view('pages.services.index', [
             'services' => $services,
+            'servicesPage' => $content,
+            'heroImage' => Media::url($content['hero']['image'], 'assets/images/services-banner.jpeg'),
             'page' => 'services',
-            'seo' => Seo::make(__('services.seo_title'), __('services.seo_description')),
+            'seo' => Seo::make($content['seo']['title'], $content['seo']['description']),
         ]);
     }
 
