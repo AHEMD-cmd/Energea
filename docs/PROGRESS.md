@@ -8,7 +8,7 @@
 | 1 — Scaffold & config | ✅ Complete — Laravel 13.38.0 + Filament 5.10.3 + packages; locales/middleware/config; MySQL `energea` DB migrated; tests green |
 | 2 — Schema, models, import | ✅ Complete — 11 migrations, 10 models + enums/trait, 10 factories, `energea:import-preview` (9 services / 14 groups / 60 items / 8 sectors / 10 projects / 14 parties / 38 clients / 18 certificates) verified against MySQL and green in tests |
 | 3 — Filament panel | ✅ Complete — Filament 5 resources (services + groups/items, projects + parties, sectors, clients, certificates), quote-request inbox, site-settings page, admin gate + `energea:make-admin`; 17 tests green; panel smoke-tested in browser |
-| 4 — Blade conversion, routes, i18n | ⏳ Pending |
+| 4 — Blade conversion, routes, i18n | ✅ Complete — EN/AR layouts + partials, all 9 public pages, legacy 301 redirects, trimmed `main.js`, localized 404; 23 tests green; smoke-tested in both locales |
 | 5 — Quote form, uploads, mail | ⏳ Pending |
 | 6 — SEO, performance, security, backup, docs | ⏳ Pending |
 | 7 — Verification & final report | ⏳ Pending |
@@ -55,6 +55,18 @@
 - Admin access: `User` implements `FilamentUser::canAccessPanel()` and requires `is_admin`; `energea:make-admin {email?} [--name=] [--password=]` promotes an existing user or creates one and prints the generated password. Non-admins get 403.
 - Tests added: `AdminPanelTest` (guest redirect, non-admin 403, every panel page renders, make-admin command) and `FilamentFormsTest` (bilingual service save, relation managers render, group+items creation via action, site-settings save). Manual browser smoke test passed (login → dashboard → services list → service edit + relation manager).
 
+## Key decisions (Phase 4)
+
+- Public layout `layouts/app.blade.php` + `partials/head|header|footer`; `head` owns SEO (`Seo::make()` → title/description/OG/twitter/favicons), locale-aware font preload (Tajawal for AR, Inter for EN) and home image preload. Header active states derive from the current route name; language switch preserves route params and query string.
+- Controllers: `HomeController` (`root()` 301 → `/{locale}`), `PageController@about`, `Services|Projects|Clients|Certificates|Contact` controllers, and `RedirectController` mapping every legacy `.html` URL to its named route with a 301 (service/project slugs resolved against published records, falling back to the index).
+- All page copy lives in `lang/{en,ar}/*` (`common`, `nav`, `footer`, `home`, `about`, `services`, `service`, `projects`, `project`, `clients`, `certificates`, `contact`); metrics/why-cards/values/cities are arrays inside the lang files. SEO titles/descriptions reproduced from the preview's AR/EN `<title>`/`meta`.
+- `app/Support/Media::url()` resolves DB image paths (http/`/` passthrough, `assets/` → `asset()`, otherwise the `public` disk) so imported and admin-uploaded images share one helper; `App\Support\Seo::make()` falls back to `SiteSetting::current()->og_image`.
+- Blade icon component renamed to `<x-ui-icon>` (file `components/ui-icon.blade.php`) to avoid colliding with blade-ui-kit's global `<x-icon>`; the `ui-icon` class is preserved so the preview CSS keeps sizing/icons intact.
+- Trimming `main.js`: removed the `ENERGEA_DATA` catalog renderers, header/footer injection and preview-only form guards (the server now renders all markup). Kept scroll progress, parallax, reveal observers, counters, nav collapse, custom cursor, contact-form captcha/location/attachment helpers.
+- `AppServiceProvider` sets `URL::defaults(['locale' => config('energea.default_locale')])` so `route()` works outside locale-scoped requests (e.g. the localized 404 page); views inside the `{locale}` group still prefer the active locale explicitly.
+- Projects listing paginates 5/page (`config('quote.projects_per_page')`) with a custom `partials.pagination` (RTL-aware chevrons); services index features the last card when the count `% 3 === 1`, matching the preview.
+- Tests: `PublicPagesTest` replaces the skeleton `ExampleTest` — root/index redirects, all public pages in both locales, Arabic `dir="rtl"` + localized copy, 5-per-page pagination, unpublished records hidden, legacy URL redirects, localized 404. Full suite 23 tests / 188 assertions green; Pint clean; browser smoke test passed for home, services index/show, projects index/show, clients (38 logos), certificates (18) and contact (both locales, RTL verified).
+
 ## Next step
 
-Phase 4: Blade conversion, public routes and i18n — layouts/partials, home/about/services/projects/clients/certificates/contact pages in EN/AR, asset copy from the preview, sitemap/SEO scaffolding as designed.
+Phase 5: quote form POST handling, attachment upload + ClamAV hook, mail delivery to `quote_recipients`, spam layers (honeypot + math captcha verify + min-fill-time + throttle) wired to the Filament quote inbox, localized success/error feedback.

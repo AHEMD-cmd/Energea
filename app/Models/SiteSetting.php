@@ -69,6 +69,11 @@ class SiteSetting extends Model
         ];
     }
 
+    public static function current(): self
+    {
+        return static::query()->first() ?? new static(static::defaults());
+    }
+
     /**
      * @return array<string, string>
      */
