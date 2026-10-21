@@ -7,7 +7,7 @@
 | 0 — Analysis (read-only) | ✅ Complete — `docs/ANALYSIS.md` written; approved |
 | 1 — Scaffold & config | ✅ Complete — Laravel 13.38.0 + Filament 5.10.3 + packages; locales/middleware/config; MySQL `energea` DB migrated; tests green |
 | 2 — Schema, models, import | ✅ Complete — 11 migrations, 10 models + enums/trait, 10 factories, `energea:import-preview` (9 services / 14 groups / 60 items / 8 sectors / 10 projects / 14 parties / 38 clients / 18 certificates) verified against MySQL and green in tests |
-| 3 — Filament panel | ⏳ Pending |
+| 3 — Filament panel | ✅ Complete — Filament 5 resources (services + groups/items, projects + parties, sectors, clients, certificates), quote-request inbox, site-settings page, admin gate + `energea:make-admin`; 17 tests green; panel smoke-tested in browser |
 | 4 — Blade conversion, routes, i18n | ⏳ Pending |
 | 5 — Quote form, uploads, mail | ⏳ Pending |
 | 6 — SEO, performance, security, backup, docs | ⏳ Pending |
@@ -44,6 +44,17 @@
 - `SiteSetting` is seeded once via `firstOrCreate(id: 1)` from the verified preview strings (footer, departments, offices, recipients); later admin edits are not overwritten by re-imports.
 - Tests: `ContentFactoriesTest` (factories/enums/casts) and `ImportPreviewDataTest` (idempotent import with `Storage::fake`, missing-path failure, count-mismatch failure) — 8 tests / 101 assertions green; Pint clean.
 
+## Key decisions (Phase 3)
+
+- Panel resources live in `app/Filament/Resources/*` with separate `Schemas/*Form` + `Tables/*Table` files (Filament 5 generator structure); navigation: Content (services→projects→clients→certificates→sectors), Requests (quote requests), Settings (site settings).
+- Bilingual editing uses EN/AR tabs built once in `App\Filament\Support\Bilingual` (Arabic fields get `dir="rtl"`); record titles are resolved through the `HasTranslations` trait.
+- Images/logos upload to the `public` disk directories used by the importer (`services/`, `projects/`, `projects/parties/`, `clients/`, `certificates/`, `images/`), so imported and admin-uploaded files share the same paths.
+- Service groups are edited through a relation manager whose item repeater is a Filament `relationship('items')` repeater (order column `sort_order`); project parties are a relation manager with a `PartyType` select + logo upload.
+- Quote requests are read-only in the admin (no create/edit pages); status is changed inline via a `SelectColumn` (new/read/handled). The view page shows contact, message, attachment download, and mail delivery state.
+- Site settings is a singleton Filament page (`SiteSetting::defaults()` shared with the importer); departments/offices are repeaters, quote recipients a tags input, social links intentionally not editable (see ASSUMPTIONS #20).
+- Admin access: `User` implements `FilamentUser::canAccessPanel()` and requires `is_admin`; `energea:make-admin {email?} [--name=] [--password=]` promotes an existing user or creates one and prints the generated password. Non-admins get 403.
+- Tests added: `AdminPanelTest` (guest redirect, non-admin 403, every panel page renders, make-admin command) and `FilamentFormsTest` (bilingual service save, relation managers render, group+items creation via action, site-settings save). Manual browser smoke test passed (login → dashboard → services list → service edit + relation manager).
+
 ## Next step
 
-Phase 3: Filament admin panel (/admin) — resources for services (+ groups/items), projects (+ parties), sectors, clients, certificates, quote requests (read/handled), site settings singleton; `is_admin` access gate, `energea:make-admin` command.
+Phase 4: Blade conversion, public routes and i18n — layouts/partials, home/about/services/projects/clients/certificates/contact pages in EN/AR, asset copy from the preview, sitemap/SEO scaffolding as designed.
