@@ -2,11 +2,11 @@
 
 @section('content')
     <section class="page-hero compact-page-hero field-photo-banner">
-        <img height="1024" width="1536" src="{{ asset('assets/images/field-electrical-testing.jpeg') }}" alt="{{ __('contact.hero_alt') }}">
+        <img height="1024" width="1536" src="{{ $heroImage }}" alt="{{ $contactPage['hero']['alt'] }}">
         <div class="container">
-            <span class="section-label light">{{ __('contact.hero_label') }}</span>
-            <h1>{{ __('contact.hero_title') }}</h1>
-            <p>{{ __('contact.hero_body') }}</p>
+            <span class="section-label light">{{ $contactPage['hero']['label'] }}</span>
+            <h1>{{ $contactPage['hero']['title'] }}</h1>
+            <p>{{ $contactPage['hero']['body'] }}</p>
         </div>
     </section>
 
@@ -15,7 +15,7 @@
             <div class="row g-4 quote-layout">
                 <div class="col-lg-4">
                     <article class="contact-card reveal">
-                        <span class="section-label light">{{ __('contact.direct_label') }}</span>
+                        <span class="section-label light">{{ $contactPage['card']['direct_label'] }}</span>
                         @foreach ($settings->departments ?? [] as $department)
                             <div class="direct-contact-entry">
                                 <h3>{{ $department['name'][app()->getLocale()] ?? $department['name']['en'] ?? '' }}</h3>
@@ -28,9 +28,9 @@
                             </div>
                         @endforeach
                         @if ($settings->general_email)
-                            <a class="contact-primary-email" href="mailto:{{ $settings->general_email }}"><span class="direct-contact-icon" aria-hidden="true"><x-ui-icon name="mail" /></span><span><small>{{ __('contact.general_email') }}</small><strong dir="ltr">{{ $settings->general_email }}</strong></span></a>
+                            <a class="contact-primary-email" href="mailto:{{ $settings->general_email }}"><span class="direct-contact-icon" aria-hidden="true"><x-ui-icon name="mail" /></span><span><small>{{ $contactPage['card']['general_email'] }}</small><strong dir="ltr">{{ $settings->general_email }}</strong></span></a>
                         @endif
-                        <h3 class="mt-4">{{ __('contact.offices') }}</h3>
+                        <h3 class="mt-4">{{ $contactPage['card']['offices'] }}</h3>
                         <div class="office-locations">
                             @foreach ($settings->offices ?? [] as $office)
                                 <a href="{{ $office['map_url'] ?? '#' }}" target="_blank" rel="noopener"><span>{{ $office['name'][app()->getLocale()] ?? $office['name']['en'] ?? '' }}</span><small>{{ __('common.open_location') }} ↗</small></a>
@@ -61,8 +61,8 @@
                             </div>
                         @endif
                         <div class="form-heading">
-                            <span class="section-label">{{ __('contact.form_label') }}</span>
-                            <h2>{{ __('contact.form_title') }}</h2>
+                            <span class="section-label">{{ $contactPage['form']['label'] }}</span>
+                            <h2>{{ $contactPage['form']['title'] }}</h2>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">

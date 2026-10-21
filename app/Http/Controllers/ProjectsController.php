@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Support\Seo;
+use App\Models\PageContent;
+use App\Support\ProjectsContent;
 use Illuminate\Contracts\View\View;
+use App\Support\Media;
 
 class ProjectsController extends Controller
 {
@@ -16,8 +19,13 @@ class ProjectsController extends Controller
             ->paginate(config('quote.projects_per_page'))
             ->withQueryString();
 
+        $content = PageContent::localized(ProjectsContent::PAGE);
+
+
         return view('pages.projects.index', [
             'projects' => $projects,
+            'projectsPage' => $content,
+            'heroImage' => Media::url($content['hero']['image'], 'assets/images/services-banner.jpeg'),
             'page' => 'projects',
             'seo' => Seo::make(__('projects.seo_title'), __('projects.seo_description')),
         ]);

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\PageContent;
+use App\Support\ServicesContent;
 use App\Models\Service;
 use App\Support\Media;
 use App\Support\Seo;
-use App\Support\ServicesContent;
 use Illuminate\Contracts\View\View;
 
 class ServicesController extends Controller

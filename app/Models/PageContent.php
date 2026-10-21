@@ -4,7 +4,11 @@ namespace App\Models;
 
 use App\Support\AboutContent;
 use App\Support\HomeContent;
+use App\Support\ProjectsContent;
 use App\Support\ServicesContent;
+use App\Support\CertificatesContent;
+use App\Support\ClientsContent;
+use App\Support\ContactContent;
 use Database\Factories\PageContentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +31,10 @@ class PageContent extends Model
             HomeContent::PAGE => HomeContent::defaults(),
             AboutContent::PAGE => AboutContent::defaults(),
             ServicesContent::PAGE => ServicesContent::defaults(),
+            ProjectsContent::PAGE => ProjectsContent::defaults(),
+            CertificatesContent::PAGE => CertificatesContent::defaults(),
+            ClientsContent::PAGE => ClientsContent::defaults(),
+            ContactContent::PAGE => ContactContent::defaults(),
             default => [],
         };
         $stored = static::query()->where('page', $page)->value('content');

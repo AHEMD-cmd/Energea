@@ -17,6 +17,10 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Models\PageContent;
+use App\Support\ContactContent;
+use App\Support\Media;
+
 
 class ContactController extends Controller
 {
@@ -27,11 +31,15 @@ class ContactController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $content = PageContent::localized(ContactContent::PAGE);
+
         session(['quote_form_ts' => now()->timestamp]);
 
         return view('pages.contact', [
             'services' => $services,
             'settings' => SiteSetting::current(),
+            'contactPage' => $content,
+            'heroImage' => Media::url($content['hero']['image'], 'assets/images/field-electrical-testing.jpeg'),
             'page' => 'contact',
             'seo' => Seo::make(__('contact.seo_title'), __('contact.seo_description')),
         ]);

@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Certificate;
 use App\Support\Seo;
 use Illuminate\Contracts\View\View;
+use App\Models\PageContent;
+use App\Support\CertificatesContent;
+use App\Support\Media;
 
 class CertificatesController extends Controller
 {
@@ -15,8 +18,13 @@ class CertificatesController extends Controller
             ->orderBy('sort_order')
             ->get();
 
+        $content = PageContent::localized(CertificatesContent::PAGE);
+
+
         return view('pages.certificates', [
             'certificates' => $certificates,
+            'certificatesPage' => $content,
+            'heroImage' => Media::url($content['hero']['image'], 'assets/images/services-banner.jpeg'),
             'page' => 'certificates',
             'seo' => Seo::make(__('certificates.seo_title'), __('certificates.seo_description')),
         ]);

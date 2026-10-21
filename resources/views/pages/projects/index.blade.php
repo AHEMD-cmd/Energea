@@ -2,11 +2,11 @@
 
 @section('content')
     <section class="page-hero compact-page-hero field-photo-banner">
-        <img height="615" width="1600" src="{{ asset('assets/images/services-banner.jpeg') }}" alt="{{ __('projects.hero_alt') }}">
+        <img height="615" width="1600" src="{{ $heroImage }}" alt="{{ $projectsPage['hero']['alt'] }}">
         <div class="container">
-            <span class="section-label light">{{ __('projects.hero_label') }}</span>
-            <h1>{{ __('projects.hero_title') }}</h1>
-            <p>{{ __('projects.hero_body') }}</p>
+            <span class="section-label light">{{ $projectsPage['hero']['label'] }}</span>
+            <h1>{{ $projectsPage['hero']['title'] }}</h1>
+            <p>{{ $projectsPage['hero']['body'] }}</p>
         </div>
     </section>
 
@@ -14,8 +14,8 @@
         <div class="container">
             <div class="row align-items-end gy-4 section-head">
                 <div class="col-12">
-                    <span class="section-label">{{ __('projects.head_label') }}</span>
-                    <h2 class="display-title">{{ __('projects.head_title_line') }}<br><em>{{ __('projects.head_title_em') }}</em>
+                    <span class="section-label">{{ $projectsPage['head']['label'] }}</span>
+                    <h2 class="display-title">{{ $projectsPage['head']['title_line'] }}<br><em>{{ $projectsPage['head']['title_em'] }}</em>
                     </h2>
                 </div>
             </div>
