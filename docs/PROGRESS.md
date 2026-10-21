@@ -6,7 +6,7 @@
 | --- | --- |
 | 0 — Analysis (read-only) | ✅ Complete — `docs/ANALYSIS.md` written; approved |
 | 1 — Scaffold & config | ✅ Complete — Laravel 13.38.0 + Filament 5.10.3 + packages; locales/middleware/config; MySQL `energea` DB migrated; tests green |
-| 2 — Schema, models, import | ⏳ Pending |
+| 2 — Schema, models, import | ✅ Complete — 11 migrations, 10 models + enums/trait, 10 factories, `energea:import-preview` (9 services / 14 groups / 60 items / 8 sectors / 10 projects / 14 parties / 38 clients / 18 certificates) verified against MySQL and green in tests |
 | 3 — Filament panel | ⏳ Pending |
 | 4 — Blade conversion, routes, i18n | ⏳ Pending |
 | 5 — Quote form, uploads, mail | ⏳ Pending |
@@ -34,6 +34,16 @@
 - `config/app.php` timezone from `APP_TIMEZONE` (Asia/Riyadh in both env files); `Model::preventLazyLoading()` outside production.
 - Verified: `/up` 200, `/` 200 with headers, `/admin` 302 → login; `php artisan test` green after Pint.
 
+## Key decisions (Phase 2)
+
+- Bilingual JSON columns cast to `array`, read through `App\Models\Concerns\HasTranslations::translate()` (locale → `en` fallback → first value).
+- Models use Laravel 13's `#[Fillable([...])]` attribute; enums: `PartyType` (client/contractor/consultant) and `QuoteRequestStatus` (new/read/handled).
+- `projects.systems` is nullable — the preview's `sheybarah` project has no systems text; `sector_id` stays `null` after import (the preview data has no sector reference; sectors are admin-only categorisation).
+- `energea:import-preview` parses the JSONC payload (object slice + line-comment strip), validates expected counts and EN/AR group/item parity, copies images byte-for-byte to the `public` disk, and upserts by natural keys (`slug`, `code`, `logo_code`, certificate page) so re-runs are idempotent. Preview-owned children (groups/items/parties) are synced with delete-extra.
+- Party rows require both `name` and `src`; `jabal-omar`'s name-only party is skipped (14 importable parties, 13 distinct logo files because `logo-015.jpeg` is reused).
+- `SiteSetting` is seeded once via `firstOrCreate(id: 1)` from the verified preview strings (footer, departments, offices, recipients); later admin edits are not overwritten by re-imports.
+- Tests: `ContentFactoriesTest` (factories/enums/casts) and `ImportPreviewDataTest` (idempotent import with `Storage::fake`, missing-path failure, count-mismatch failure) — 8 tests / 101 assertions green; Pint clean.
+
 ## Next step
 
-Phase 2: migrations/models/factories for the full schema, `HasTranslations` trait, observers, `energea:import-preview` command (JSONC `data.js` → DB + images), seeders, smoke-run the importer.
+Phase 3: Filament admin panel (/admin) — resources for services (+ groups/items), projects (+ parties), sectors, clients, certificates, quote requests (read/handled), site settings singleton; `is_admin` access gate, `energea:make-admin` command.
