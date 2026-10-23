@@ -11,9 +11,9 @@ enum PartyType: string
     public function label(): string
     {
         return match ($this) {
-            self::Client => 'Client',
-            self::Contractor => 'Contractor',
-            self::Consultant => 'Consultant',
+            self::Client => __('admin.enums.party.client'),
+            self::Contractor => __('admin.enums.party.contractor'),
+            self::Consultant => __('admin.enums.party.consultant'),
         };
     }
 }

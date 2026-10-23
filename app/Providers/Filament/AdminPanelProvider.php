@@ -2,8 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Controllers\Admin\LocaleController;
 use App\Http\Middleware\ForceHttps;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetAdminLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -12,6 +14,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -19,6 +22,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -56,8 +60,16 @@ class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 SecurityHeaders::class,
             ])
+            ->middleware([
+                SetAdminLocale::class,
+            ], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->routes(function (): void {
+                Route::post('/locale/{locale}', LocaleController::class)->name('locale');
+            })
+            ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn (): string => view('filament.locale-switcher')->render())
+            ->renderHook(PanelsRenderHook::AUTH_LOGIN_FORM_AFTER, fn (): string => view('filament.locale-switcher')->render());
     }
 }

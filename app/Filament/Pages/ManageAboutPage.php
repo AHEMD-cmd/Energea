@@ -29,11 +29,17 @@ class ManageAboutPage extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInformationCircle;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.content');
+    }
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $title = 'About page';
+    public function getTitle(): string
+    {
+        return __('admin.pages.about');
+    }
 
     /**
      * @var array<string, mixed> | null
@@ -47,48 +53,48 @@ class ManageAboutPage extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'About page';
+        return __('admin.pages.about');
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('SEO')
-                    ->description('Browser title and search description for the about page.')
+                Section::make(__('admin.sections.seo'))
+                    ->description(__('admin.descriptions.about_seo'))
                     ->schema([
                         Bilingual::tabs([
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'description' => Bilingual::textarea('description', 'Description', required: true, rows: 3),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'description' => Bilingual::textarea('description', __('admin.fields.description'), required: true, rows: 3),
                         ], 'seo'),
                     ])
                     ->collapsible(),
-                Section::make('Hero')
-                    ->description('The banner at the top of the about page.')
+                Section::make(__('admin.sections.hero'))
+                    ->description(__('admin.descriptions.about_hero'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'hero'),
                         Placeholder::make('current_hero_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(AboutContent::PAGE)['hero']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/about-banner.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Hero image',
-                                    'hint' => 'Wide image, recommended 1600 × 615 px.',
+                                    'title' => __('admin.titles.hero_image'),
+                                    'hint' => __('admin.descriptions.image_hint_wide'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('hero_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one. A wide image (recommended 1600×615) works best.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.upload_replace_wide'))
                             ->image()
                             ->disk('public')
                             ->directory('images/about')
@@ -96,39 +102,39 @@ class ManageAboutPage extends Page
                             ->maxSize(5120)
                             ->columnSpanFull(),
                         Toggle::make('hero_image_reset')
-                            ->label('Use the default hero image')
-                            ->helperText('Turn on to remove the custom image when saving.')
+                            ->label(__('admin.fields.use_default_hero_image'))
+                            ->helperText(__('admin.descriptions.remove_custom_image'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Snapshot')
-                    ->description('The introduction block with the testing image.')
+                Section::make(__('admin.sections.snapshot'))
+                    ->description(__('admin.descriptions.about_intro'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'cta' => Bilingual::text('cta', 'Link label', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'cta' => Bilingual::text('cta', __('admin.fields.link_label'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'snapshot'),
                         Placeholder::make('current_snapshot_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(AboutContent::PAGE)['snapshot']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/field-electrical-testing.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Snapshot image',
-                                    'hint' => 'Landscape image, recommended 1536 × 1024 px.',
+                                    'title' => __('admin.titles.snapshot_image'),
+                                    'hint' => __('admin.descriptions.image_hint_about_snapshot'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('snapshot_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one. A landscape image (recommended 1536×1024) works best.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.upload_replace_landscape'))
                             ->image()
                             ->disk('public')
                             ->directory('images/about')
@@ -136,94 +142,96 @@ class ManageAboutPage extends Page
                             ->maxSize(5120)
                             ->columnSpanFull(),
                         Toggle::make('snapshot_image_reset')
-                            ->label('Use the default snapshot image')
-                            ->helperText('Turn on to remove the custom image when saving.')
+                            ->label(__('admin.fields.use_default_snapshot_image'))
+                            ->helperText(__('admin.descriptions.remove_custom_image'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Purpose')
-                    ->description('The heading above the mission, vision and values blocks.')
+                Section::make(__('admin.sections.purpose'))
+                    ->description(__('admin.descriptions.about_heading'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
                         ], 'purpose'),
                     ])
                     ->collapsible(),
-                Section::make('Mission')
+                Section::make(__('admin.sections.mission'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
                         ], 'mission'),
                     ])
                     ->collapsible(),
-                Section::make('Vision')
+                Section::make(__('admin.sections.vision'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
                         ], 'vision'),
                     ])
                     ->collapsible(),
-                Section::make('Values')
+                Section::make(__('admin.sections.values'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'aria' => Bilingual::text('aria', 'Accessible label', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'aria' => Bilingual::text('aria', __('admin.fields.accessible_label'), required: true),
                         ], 'values'),
                         Repeater::make('values.items')
-                            ->label('Values')
+                            ->label(__('admin.sections.values'))
                             ->schema([
                                 TextInput::make('en')
-                                    ->label('Value (English)')
+                                    ->label(__('admin.fields.value_en'))
                                     ->required(),
                                 TextInput::make('ar')
-                                    ->label('Value (Arabic)')
+                                    ->label(__('admin.fields.value_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                             ])
                             ->columns(2)
                             ->defaultItems(0)
                             ->reorderable()
-                            ->addActionLabel('Add value')
+                            ->addActionLabel(__('admin.actions.add_value'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Metrics band')
-                    ->description('The counters displayed below the purpose section.')
+                Section::make(__('admin.sections.metrics_band'))
+                    ->description(__('admin.descriptions.about_metrics'))
                     ->schema([
                         Repeater::make('metrics')
                             ->hiddenLabel()
                             ->schema([
                                 TextInput::make('label.en')
-                                    ->label('Label (English)')
+                                    ->label(__('admin.fields.label_en'))
                                     ->required(),
                                 TextInput::make('label.ar')
-                                    ->label('Label (Arabic)')
+                                    ->label(__('admin.fields.label_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                                 TextInput::make('value')
+                                    ->label(__('admin.fields.value'))
                                     ->required()
                                     ->maxLength(20),
                                 TextInput::make('suffix')
+                                    ->label(__('admin.fields.suffix'))
                                     ->maxLength(20),
                                 TextInput::make('caption.en')
-                                    ->label('Caption (English)')
+                                    ->label(__('admin.fields.caption_en'))
                                     ->required(),
                                 TextInput::make('caption.ar')
-                                    ->label('Caption (Arabic)')
+                                    ->label(__('admin.fields.caption_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                             ])
                             ->columns(2)
                             ->defaultItems(0)
                             ->reorderable()
-                            ->addActionLabel('Add metric')
+                            ->addActionLabel(__('admin.actions.add_metric'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
@@ -241,7 +249,7 @@ class ManageAboutPage extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
-                                ->label('Save about page')
+                                ->label(__('admin.actions.save_about'))
                                 ->submit('save'),
                         ])->key('form-actions'),
                     ]),
@@ -283,7 +291,7 @@ class ManageAboutPage extends Page
 
         Notification::make()
             ->success()
-            ->title('About page saved')
+            ->title(__('admin.notifications.about_saved'))
             ->send();
     }
 }

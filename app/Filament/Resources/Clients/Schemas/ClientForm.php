@@ -18,35 +18,38 @@ class ClientForm
     {
         return $schema
             ->components([
-                Section::make('Client')
+                Section::make(__('admin.sections.client'))
                     ->schema([
                         TextInput::make('logo_code')
+                            ->label(__('admin.fields.logo_code'))
                             ->required()
                             ->maxLength(3)
                             ->unique(ignoreRecord: true),
                         TextInput::make('sort_order')
+                            ->label(__('admin.fields.sort_order'))
                             ->numeric()
                             ->default(0)
                             ->required(),
                         Toggle::make('is_published')
+                            ->label(__('admin.fields.is_published'))
                             ->default(true),
                         Placeholder::make('current_logo')
-                            ->label('Current logo')
+                            ->label(__('admin.fields.current_logo'))
                             ->content(function (?Client $record) {
                                 $logo = $record?->logo;
 
                                 return view('filament.forms.image-preview', [
                                     'url' => filled($logo) ? Media::url($logo) : null,
                                     'isCustom' => filled($logo),
-                                    'title' => 'Client logo',
-                                    'hint' => 'Logo on a transparent or plain background recommended.',
+                                    'title' => __('admin.titles.client_logo'),
+                                    'hint' => __('admin.descriptions.image_hint_logo'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('logo_upload')
-                            ->label('Upload logo')
-                            ->helperText('Upload a new logo to replace the current one.')
+                            ->label(__('admin.fields.upload_logo'))
+                            ->helperText(__('admin.descriptions.upload_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('clients')
@@ -56,7 +59,7 @@ class ClientForm
                     ])
                     ->columnSpanFull(),
                 Bilingual::tabs([
-                    'name' => Bilingual::text('name', 'Name'),
+                    'name' => Bilingual::text('name', __('admin.fields.name')),
                 ]),
             ]);
     }

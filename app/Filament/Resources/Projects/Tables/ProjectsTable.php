@@ -19,22 +19,26 @@ class ProjectsTable
             ->reorderable('sort_order')
             ->columns([
                 ImageColumn::make('image')
+                    ->label(__('admin.fields.image'))
                     ->disk('public')
                     ->square(),
                 TextColumn::make('title.en')
-                    ->label('Title')
+                    ->label(__('admin.fields.title'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('location.en')
-                    ->label('Location'),
+                    ->label(__('admin.fields.location')),
                 TextColumn::make('sector.title.en')
-                    ->label('Sector')
-                    ->placeholder('—'),
+                    ->label(__('admin.fields.sector'))
+                    ->placeholder(__('admin.placeholders.none')),
                 TextColumn::make('year')
+                    ->label(__('admin.fields.year'))
                     ->sortable(),
                 IconColumn::make('is_published')
+                    ->label(__('admin.fields.is_published'))
                     ->boolean(),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

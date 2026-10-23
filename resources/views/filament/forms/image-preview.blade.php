@@ -10,14 +10,14 @@
     @if (filled($url))
         <img src="{{ $url }}" alt="" class="energea-image-preview__image">
     @else
-        <div class="energea-image-preview__image energea-image-preview__image--empty">No image</div>
+        <div class="energea-image-preview__image energea-image-preview__image--empty">{{ __('admin.image.empty') }}</div>
     @endif
 
     <div class="energea-image-preview__body">
         <div class="energea-image-preview__heading">
             <span class="energea-image-preview__title">{{ $title }}</span>
             <span @class(['energea-image-preview__badge', 'is-custom' => $isCustom])>
-                {{ $isCustom ? 'Custom' : 'Default' }}
+                {{ $isCustom ? __('admin.image.custom') : __('admin.image.default') }}
             </span>
         </div>
 

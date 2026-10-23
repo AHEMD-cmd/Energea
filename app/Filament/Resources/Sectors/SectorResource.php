@@ -22,9 +22,22 @@ class SectorResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.content');
+    }
 
     protected static ?int $navigationSort = 50;
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.sector.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.sector.plural');
+    }
 
     public static function form(Schema $schema): Schema
     {

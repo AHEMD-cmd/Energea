@@ -17,17 +17,20 @@ class SectorsTable
             ->defaultSort('sort_order')
             ->columns([
                 TextColumn::make('code')
+                    ->label(__('admin.fields.code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('title.en')
-                    ->label('Title')
+                    ->label(__('admin.fields.title'))
                     ->searchable(),
                 TextColumn::make('projects_count')
                     ->counts('projects')
-                    ->label('Projects'),
+                    ->label(__('admin.fields.projects_count')),
                 IconColumn::make('is_published')
+                    ->label(__('admin.fields.is_published'))
                     ->boolean(),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

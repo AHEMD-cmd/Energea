@@ -30,11 +30,17 @@ class ManageHomePage extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.content');
+    }
 
     protected static ?int $navigationSort = 0;
 
-    protected static ?string $title = 'Home page';
+    public function getTitle(): string
+    {
+        return __('admin.pages.home');
+    }
 
     /**
      * @var array<string, mixed> | null
@@ -48,52 +54,52 @@ class ManageHomePage extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Home page';
+        return __('admin.pages.home');
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('SEO')
-                    ->description('Browser title and search description for the home page.')
+                Section::make(__('admin.sections.seo'))
+                    ->description(__('admin.descriptions.home_seo'))
                     ->schema([
                         Bilingual::tabs([
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'description' => Bilingual::textarea('description', 'Description', required: true, rows: 3),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'description' => Bilingual::textarea('description', __('admin.fields.description'), required: true, rows: 3),
                         ], 'seo'),
                     ])
                     ->collapsible(),
-                Section::make('Hero')
-                    ->description('The first screen: headline, introduction and visual caption.')
+                Section::make(__('admin.sections.hero'))
+                    ->description(__('admin.descriptions.home_hero'))
                     ->schema([
                         Bilingual::tabs([
-                            'kicker' => Bilingual::text('kicker', 'Kicker', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_strong' => Bilingual::text('title_strong', 'Title (highlighted)', required: true),
-                            'intro' => Bilingual::textarea('intro', 'Introduction', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
-                            'visual_label' => Bilingual::text('visual_label', 'Visual card label', required: true),
-                            'visual_value' => Bilingual::text('visual_value', 'Visual card value', required: true),
-                            'visual_caption' => Bilingual::text('visual_caption', 'Visual card caption', required: true),
-                            'cities' => Bilingual::text('cities', 'Cities line', required: true),
+                            'kicker' => Bilingual::text('kicker', __('admin.fields.kicker'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_strong' => Bilingual::text('title_strong', __('admin.fields.title_highlighted'), required: true),
+                            'intro' => Bilingual::textarea('intro', __('admin.fields.introduction'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
+                            'visual_label' => Bilingual::text('visual_label', __('admin.fields.visual_card_label'), required: true),
+                            'visual_value' => Bilingual::text('visual_value', __('admin.fields.visual_card_value'), required: true),
+                            'visual_caption' => Bilingual::text('visual_caption', __('admin.fields.visual_card_caption'), required: true),
+                            'cities' => Bilingual::text('cities', __('admin.fields.cities_line'), required: true),
                         ], 'hero'),
                         Placeholder::make('current_hero_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(HomeContent::PAGE)['hero']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/field-panel-desktop.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Hero image',
-                                    'hint' => 'Portrait image, recommended 1201 × 1600 px.',
+                                    'title' => __('admin.sections.hero'),
+                                    'hint' => __('admin.descriptions.image_hint_portrait'),
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('hero_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one. A portrait image (recommended 1201×1600) works best.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.image_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('images/home')
@@ -101,117 +107,121 @@ class ManageHomePage extends Page
                             ->maxSize(5120)
                             ->columnSpanFull(),
                         Toggle::make('hero_image_reset')
-                            ->label('Use the default hero image')
-                            ->helperText('Turn on to remove the custom image when saving.')
+                            ->label(__('admin.fields.use_default_hero_image'))
+                            ->helperText(__('admin.descriptions.remove_custom_image'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Positioning')
-                    ->description('The introduction block that follows the hero.')
+
+                Section::make(__('admin.sections.positioning'))
+                    ->description(__('admin.descriptions.home_positioning'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'point_1' => Bilingual::text('point_1', 'Point 1', required: true),
-                            'point_2' => Bilingual::text('point_2', 'Point 2', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'cta' => Bilingual::text('cta', 'Link label', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'point_1' => Bilingual::text('point_1', __('admin.fields.point_1'), required: true),
+                            'point_2' => Bilingual::text('point_2', __('admin.fields.point_2'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'cta' => Bilingual::text('cta', __('admin.fields.link_label'), required: true),
                         ], 'positioning'),
                     ])
                     ->collapsible(),
-                Section::make('Metrics band')
-                    ->description('The counters displayed under the positioning block.')
+                Section::make(__('admin.sections.metrics_band'))
+                    ->description(__('admin.descriptions.home_metrics'))
                     ->schema([
                         Repeater::make('metrics')
                             ->hiddenLabel()
                             ->schema([
                                 TextInput::make('label.en')
-                                    ->label('Label (English)')
+                                    ->label(__('admin.fields.label_en'))
                                     ->required(),
                                 TextInput::make('label.ar')
-                                    ->label('Label (Arabic)')
+                                    ->label(__('admin.fields.label_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                                 TextInput::make('value')
+                                    ->label(__('admin.fields.value'))
                                     ->required()
                                     ->maxLength(20),
                                 TextInput::make('suffix')
+                                    ->label(__('admin.fields.suffix'))
                                     ->maxLength(20),
                                 TextInput::make('caption.en')
-                                    ->label('Caption (English)')
+                                    ->label(__('admin.fields.caption_en'))
                                     ->required(),
                                 TextInput::make('caption.ar')
-                                    ->label('Caption (Arabic)')
+                                    ->label(__('admin.fields.caption_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                             ])
                             ->columns(2)
                             ->defaultItems(0)
                             ->reorderable()
-                            ->addActionLabel('Add metric')
+                            ->addActionLabel(__('admin.actions.add_metric'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Why Energea')
-                    ->description('The dark section with the four reason cards.')
+                Section::make(__('admin.sections.why_energea'))
+                    ->description(__('admin.descriptions.home_why'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'intro' => Bilingual::textarea('intro', 'Introduction', required: true, rows: 3),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'intro' => Bilingual::textarea('intro', __('admin.fields.introduction'), required: true, rows: 3),
                         ], 'why'),
                         Repeater::make('why.cards')
-                            ->label('Cards')
+                            ->label(__('admin.sections.cards'))
                             ->schema([
                                 Select::make('icon')
+                                    ->label(__('admin.fields.icon'))
                                     ->options(collect(HomeContent::ICONS)->mapWithKeys(
                                         fn (string $icon): array => [$icon => ucfirst($icon)],
                                     )->all())
                                     ->required(),
                                 TextInput::make('title.en')
-                                    ->label('Title (English)')
+                                    ->label(__('admin.fields.title_en'))
                                     ->required(),
                                 TextInput::make('title.ar')
-                                    ->label('Title (Arabic)')
+                                    ->label(__('admin.fields.title_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                                 TextInput::make('body.en')
-                                    ->label('Body (English)')
+                                    ->label(__('admin.fields.body_en'))
                                     ->required(),
                                 TextInput::make('body.ar')
-                                    ->label('Body (Arabic)')
+                                    ->label(__('admin.fields.body_ar'))
                                     ->required()
                                     ->extraAttributes(['dir' => 'rtl']),
                             ])
                             ->columns(2)
                             ->defaultItems(0)
                             ->reorderable()
-                            ->addActionLabel('Add card')
+                            ->addActionLabel(__('admin.actions.add_card'))
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Industries')
-                    ->description('The heading above the sector cards. Sector cards themselves are edited under Sectors.')
+                Section::make(__('admin.sections.industries'))
+                    ->description(__('admin.descriptions.home_sectors'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'intro' => Bilingual::textarea('intro', 'Introduction', required: true, rows: 3),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'intro' => Bilingual::textarea('intro', __('admin.fields.introduction'), required: true, rows: 3),
                         ], 'industries'),
                     ])
                     ->collapsible(),
-                Section::make('Final call to action')
-                    ->description('The closing banner at the bottom of the home page.')
+                Section::make(__('admin.sections.final_cta'))
+                    ->description(__('admin.descriptions.home_cta'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true, rows: 3),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true, rows: 3),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'final'),
                     ])
                     ->collapsible(),
@@ -229,7 +239,7 @@ class ManageHomePage extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
-                                ->label('Save home page')
+                                ->label(__('admin.actions.save_home'))
                                 ->submit('save'),
                         ])->key('form-actions'),
                     ]),
@@ -263,7 +273,7 @@ class ManageHomePage extends Page
 
         Notification::make()
             ->success()
-            ->title('Home page saved')
+            ->title(__('admin.notifications.home_saved'))
             ->send();
     }
 }

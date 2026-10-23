@@ -26,11 +26,17 @@ class ManageServicesPage extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrenchScrewdriver;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
-
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $title = 'Services page';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.content');
+    }
+
+    public function getTitle(): string
+    {
+        return __('admin.pages.services');
+    }
 
     /**
      * @var array<string, mixed> | null
@@ -44,48 +50,48 @@ class ManageServicesPage extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Services page';
+        return __('admin.pages.services');
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('SEO')
-                    ->description('Browser title and search description for the services page.')
+                Section::make(__('admin.sections.seo'))
+                    ->description(__('admin.descriptions.services_seo'))
                     ->schema([
                         Bilingual::tabs([
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'description' => Bilingual::textarea('description', 'Description', required: true, rows: 3),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'description' => Bilingual::textarea('description', __('admin.fields.description'), required: true, rows: 3),
                         ], 'seo'),
                     ])
                     ->collapsible(),
-                Section::make('Hero')
-                    ->description('The banner at the top of the services page.')
+                Section::make(__('admin.sections.hero'))
+                    ->description(__('admin.descriptions.services_hero'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'hero'),
                         Placeholder::make('current_hero_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(ServicesContent::PAGE)['hero']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/services-banner.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Hero image',
-                                    'hint' => 'Wide image, recommended 1600 × 615 px.',
+                                    'title' => __('admin.titles.hero_image'),
+                                    'hint' => __('admin.descriptions.image_hint_wide'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('hero_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one. A wide image (recommended 1600×615) works best.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.upload_replace_wide'))
                             ->image()
                             ->disk('public')
                             ->directory('images/services')
@@ -94,14 +100,14 @@ class ManageServicesPage extends Page
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Capabilities heading')
-                    ->description('The heading above the list of services.')
+                Section::make(__('admin.sections.capabilities_heading'))
+                    ->description(__('admin.descriptions.services_heading'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
                         ], 'head'),
                     ])
                     ->collapsible(),
@@ -119,7 +125,7 @@ class ManageServicesPage extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
-                                ->label('Save services page')
+                                ->label(__('admin.actions.save_services'))
                                 ->submit('save'),
                         ])->key('form-actions'),
                     ]),
@@ -151,7 +157,7 @@ class ManageServicesPage extends Page
 
         Notification::make()
             ->success()
-            ->title('Services page saved')
+            ->title(__('admin.notifications.services_saved'))
             ->send();
     }
 }

@@ -26,11 +26,17 @@ class ManageClientsPage extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
-
     protected static ?int $navigationSort = 5;
 
-    protected static ?string $title = 'Clients page';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.content');
+    }
+
+    public function getTitle(): string
+    {
+        return __('admin.pages.clients');
+    }
 
     /**
      * @var array<string, mixed> | null
@@ -44,48 +50,48 @@ class ManageClientsPage extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Clients page';
+        return __('admin.pages.clients');
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('SEO')
-                    ->description('Browser title and search description for the clients page.')
+                Section::make(__('admin.sections.seo'))
+                    ->description(__('admin.descriptions.clients_seo'))
                     ->schema([
                         Bilingual::tabs([
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'description' => Bilingual::textarea('description', 'Description', required: true, rows: 3),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'description' => Bilingual::textarea('description', __('admin.fields.description'), required: true, rows: 3),
                         ], 'seo'),
                     ])
                     ->collapsible(),
-                Section::make('Hero')
-                    ->description('The banner at the top of the clients page.')
+                Section::make(__('admin.sections.hero'))
+                    ->description(__('admin.descriptions.clients_hero'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'hero'),
                         Placeholder::make('current_hero_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(ClientsContent::PAGE)['hero']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/about-banner.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Hero image',
-                                    'hint' => 'Wide image, recommended 1600 × 615 px.',
+                                    'title' => __('admin.titles.hero_image'),
+                                    'hint' => __('admin.descriptions.image_hint_wide'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('hero_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one. A wide image (recommended 1600×615) works best.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.upload_replace_wide'))
                             ->image()
                             ->disk('public')
                             ->directory('images/clients')
@@ -94,45 +100,45 @@ class ManageClientsPage extends Page
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Clients heading')
-                    ->description('The heading and side card above the list of clients.')
+                Section::make(__('admin.sections.clients_heading'))
+                    ->description(__('admin.descriptions.clients_intro'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'side_title' => Bilingual::text('side_title', 'Side card title', required: true),
-                            'side_body' => Bilingual::textarea('side_body', 'Side card body', required: true, rows: 3),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'side_title' => Bilingual::text('side_title', __('admin.fields.side_card_title'), required: true),
+                            'side_body' => Bilingual::textarea('side_body', __('admin.fields.side_card_body'), required: true, rows: 3),
                         ], 'head'),
                     ])
                     ->collapsible(),
-                Section::make('Final call to action')
-                    ->description('The banner at the bottom of the clients page.')
+                Section::make(__('admin.sections.final_cta'))
+                    ->description(__('admin.descriptions.clients_cta'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title_line' => Bilingual::text('title_line', 'Title (first line)', required: true),
-                            'title_em' => Bilingual::text('title_em', 'Title (highlighted)', required: true),
-                            'cta' => Bilingual::text('cta', 'Button text', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title_line' => Bilingual::text('title_line', __('admin.fields.title_first_line'), required: true),
+                            'title_em' => Bilingual::text('title_em', __('admin.fields.title_highlighted'), required: true),
+                            'cta' => Bilingual::text('cta', __('admin.fields.button_text'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'final'),
                         Placeholder::make('current_final_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(ClientsContent::PAGE)['final']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/projects/damac-data-center.webp'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Call to action image',
-                                    'hint' => 'Recommended around 492 × 448 px.',
+                                    'title' => __('admin.titles.call_to_action_image'),
+                                    'hint' => __('admin.descriptions.image_hint_cta'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('final_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.upload_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('images/clients')
@@ -155,7 +161,7 @@ class ManageClientsPage extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
-                                ->label('Save clients page')
+                                ->label(__('admin.actions.save_clients'))
                                 ->submit('save'),
                         ])->key('form-actions'),
                     ]),
@@ -181,7 +187,7 @@ class ManageClientsPage extends Page
 
         Notification::make()
             ->success()
-            ->title('Clients page saved')
+            ->title(__('admin.notifications.clients_saved'))
             ->send();
     }
 

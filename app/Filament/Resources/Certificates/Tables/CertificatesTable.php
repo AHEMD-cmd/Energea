@@ -19,16 +19,19 @@ class CertificatesTable
             ->reorderable('sort_order')
             ->columns([
                 ImageColumn::make('image')
+                    ->label(__('admin.fields.image'))
                     ->disk('public')
                     ->square(),
                 TextColumn::make('name.en')
-                    ->label('Name')
+                    ->label(__('admin.fields.name'))
                     ->searchable(),
                 TextColumn::make('type.en')
-                    ->label('Type'),
+                    ->label(__('admin.fields.type')),
                 IconColumn::make('is_published')
+                    ->label(__('admin.fields.is_published'))
                     ->boolean(),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

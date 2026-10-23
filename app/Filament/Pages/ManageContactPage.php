@@ -26,11 +26,17 @@ class ManageContactPage extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Content';
-
     protected static ?int $navigationSort = 6;
 
-    protected static ?string $title = 'Contact page';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.content');
+    }
+
+    public function getTitle(): string
+    {
+        return __('admin.pages.contact');
+    }
 
     /**
      * @var array<string, mixed> | null
@@ -44,48 +50,48 @@ class ManageContactPage extends Page
 
     public static function getNavigationLabel(): string
     {
-        return 'Contact page';
+        return __('admin.pages.contact');
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('SEO')
-                    ->description('Browser title and search description for the contact page.')
+                Section::make(__('admin.sections.seo'))
+                    ->description(__('admin.descriptions.contact_seo'))
                     ->schema([
                         Bilingual::tabs([
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'description' => Bilingual::textarea('description', 'Description', required: true, rows: 3),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'description' => Bilingual::textarea('description', __('admin.fields.description'), required: true, rows: 3),
                         ], 'seo'),
                     ])
                     ->collapsible(),
-                Section::make('Hero')
-                    ->description('The banner at the top of the contact page.')
+                Section::make(__('admin.sections.hero'))
+                    ->description(__('admin.descriptions.contact_hero'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
-                            'body' => Bilingual::textarea('body', 'Body', required: true),
-                            'alt' => Bilingual::text('alt', 'Image alt text', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                            'body' => Bilingual::textarea('body', __('admin.fields.body'), required: true),
+                            'alt' => Bilingual::text('alt', __('admin.fields.image_alt'), required: true),
                         ], 'hero'),
                         Placeholder::make('current_hero_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(ContactContent::PAGE)['hero']['image'];
 
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/field-electrical-testing.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
-                                    'title' => 'Hero image',
-                                    'hint' => 'Wide image, recommended 1536 × 1024 px.',
+                                    'title' => __('admin.titles.hero_image'),
+                                    'hint' => __('admin.descriptions.image_hint_about_snapshot'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('hero_image_upload')
-                            ->label('Replace image')
-                            ->helperText('Upload a new image to replace the current one.')
+                            ->label(__('admin.fields.replace_image'))
+                            ->helperText(__('admin.descriptions.upload_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('images/contact')
@@ -94,22 +100,22 @@ class ManageContactPage extends Page
                             ->columnSpanFull(),
                     ])
                     ->collapsible(),
-                Section::make('Contact card')
-                    ->description('Labels on the card beside the form. Departments, offices, and the general email are managed in Settings.')
+                Section::make(__('admin.sections.contact_card'))
+                    ->description(__('admin.descriptions.contact_card'))
                     ->schema([
                         Bilingual::tabs([
-                            'direct_label' => Bilingual::text('direct_label', 'Direct contact label', required: true),
-                            'general_email' => Bilingual::text('general_email', 'General email label', required: true),
-                            'offices' => Bilingual::text('offices', 'Offices heading', required: true),
+                            'direct_label' => Bilingual::text('direct_label', __('admin.fields.direct_contact_label'), required: true),
+                            'general_email' => Bilingual::text('general_email', __('admin.fields.general_email_label'), required: true),
+                            'offices' => Bilingual::text('offices', __('admin.fields.offices_heading'), required: true),
                         ], 'card'),
                     ])
                     ->collapsible(),
-                Section::make('Form heading')
-                    ->description('The heading above the quote request form.')
+                Section::make(__('admin.sections.form_heading'))
+                    ->description(__('admin.descriptions.contact_form_heading'))
                     ->schema([
                         Bilingual::tabs([
-                            'label' => Bilingual::text('label', 'Section label', required: true),
-                            'title' => Bilingual::text('title', 'Title', required: true),
+                            'label' => Bilingual::text('label', __('admin.fields.section_label'), required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
                         ], 'form'),
                     ])
                     ->collapsible(),
@@ -127,7 +133,7 @@ class ManageContactPage extends Page
                     ->footer([
                         Actions::make([
                             Action::make('save')
-                                ->label('Save contact page')
+                                ->label(__('admin.actions.save_contact'))
                                 ->submit('save'),
                         ])->key('form-actions'),
                     ]),
@@ -159,7 +165,7 @@ class ManageContactPage extends Page
 
         Notification::make()
             ->success()
-            ->title('Contact page saved')
+            ->title(__('admin.notifications.contact_saved'))
             ->send();
     }
 }

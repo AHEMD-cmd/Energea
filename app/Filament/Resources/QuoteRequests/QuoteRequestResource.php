@@ -19,9 +19,22 @@ class QuoteRequestResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInbox;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Requests';
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return __('admin.navigation.groups.requests');
+    }
 
     protected static ?int $navigationSort = 10;
+
+    public static function getModelLabel(): string
+    {
+        return __('admin.resources.quote_request.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('admin.resources.quote_request.plural');
+    }
 
     public static function infolist(Schema $schema): Schema
     {

@@ -11,9 +11,9 @@ enum QuoteRequestStatus: string
     public function label(): string
     {
         return match ($this) {
-            self::New => 'New',
-            self::Read => 'Read',
-            self::Handled => 'Handled',
+            self::New => __('admin.enums.quote_status.new'),
+            self::Read => __('admin.enums.quote_status.read'),
+            self::Handled => __('admin.enums.quote_status.handled'),
         };
     }
 }

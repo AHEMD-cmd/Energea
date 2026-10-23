@@ -18,31 +18,33 @@ class CertificateForm
     {
         return $schema
             ->components([
-                Section::make('Certificate')
+                Section::make(__('admin.sections.certificate'))
                     ->schema([
                         TextInput::make('sort_order')
+                            ->label(__('admin.fields.sort_order'))
                             ->numeric()
                             ->default(0)
                             ->required(),
                         Toggle::make('is_published')
+                            ->label(__('admin.fields.is_published'))
                             ->default(true),
                         Placeholder::make('current_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function (?Certificate $record) {
                                 $image = $record?->image;
 
                                 return view('filament.forms.image-preview', [
                                     'url' => filled($image) ? Media::url($image) : null,
                                     'isCustom' => filled($image),
-                                    'title' => 'Certificate image',
-                                    'hint' => 'Clear scan or photo of the certificate recommended.',
+                                    'title' => __('admin.titles.certificate_image'),
+                                    'hint' => __('admin.descriptions.image_hint_certificate'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('image_upload')
-                            ->label('Upload image')
-                            ->helperText('Upload a new image to replace the current one.')
+                            ->label(__('admin.fields.upload_image'))
+                            ->helperText(__('admin.descriptions.upload_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('certificates')
@@ -53,8 +55,8 @@ class CertificateForm
                     ])
                     ->columnSpanFull(),
                 Bilingual::tabs([
-                    'name' => Bilingual::text('name', 'Name'),
-                    'type' => Bilingual::text('type', 'Type'),
+                    'name' => Bilingual::text('name', __('admin.fields.name')),
+                    'type' => Bilingual::text('type', __('admin.fields.type')),
                 ]),
             ]);
     }

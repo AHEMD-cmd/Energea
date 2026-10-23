@@ -17,27 +17,32 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class PartiesRelationManager extends RelationManager
 {
     protected static string $relationship = 'parties';
 
-    protected static ?string $title = 'Project parties';
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('admin.titles.project_parties');
+    }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('Party')
+                Section::make(__('admin.sections.party'))
                     ->schema([
                         Select::make('party_type')
+                            ->label(__('admin.fields.party_type'))
                             ->options(fn (): array => collect(PartyType::cases())
                                 ->mapWithKeys(fn (PartyType $type): array => [$type->value => $type->label()])
                                 ->all())
                             ->required(),
-                        ImageUpload::make('logo', 'projects/parties'),
+                        ImageUpload::make('logo', 'projects/parties', label: __('admin.fields.logo')),
                         Bilingual::tabs([
-                            'name' => Bilingual::text('name', 'Name', required: true),
+                            'name' => Bilingual::text('name', __('admin.fields.name'), required: true),
                         ]),
                     ]),
             ]);
@@ -50,15 +55,18 @@ class PartiesRelationManager extends RelationManager
             ->reorderable('sort_order')
             ->columns([
                 ImageColumn::make('logo')
+                    ->label(__('admin.fields.logo'))
                     ->disk('public')
                     ->square(),
                 TextColumn::make('name.en')
-                    ->label('Name')
+                    ->label(__('admin.fields.name'))
                     ->searchable(),
                 TextColumn::make('party_type')
+                    ->label(__('admin.fields.party_type'))
                     ->badge()
                     ->formatStateUsing(fn (PartyType $state): string => $state->label()),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

@@ -25,13 +25,13 @@ Brief wins over the handoff where they conflict. Each conflict/assumption is log
 12. **CSP**: skipped initially (GA4 + Turnstile + inline scripts would break); documented in the security notes in Phase 6.
 13. **ClamAV**: config flag `quote.clamav.enabled`, off by default; the hook scans attachments when enabled and rejects on detection.
 14. **Min-fill-time token**: hidden `form_ts` field set on GET; submissions faster than ~3 s are rejected (spam layer alongside honeypot + challenge + throttle).
-15. **Turnstile vs math captcha**: Turnstile used only when both keys are present in `.env`; otherwise the session math captcha reusing the existing verification-panel markup, with a refresh endpoint.
+15. **Turnstile vs math captcha**: the quote form currently uses the session math captcha (refresh endpoint included). Turnstile keys are wired into `config/services.php` but the server-side siteverify call is deferred to the Phase 6 launch checklist; when enabled it replaces the math challenge rather than stacking with it.
 16. **Localized 404s**: `errors/404.blade.php` renders in the current locale with the app layout.
 17. **Admin path**: `/admin` by default, overridable via env (Filament panel path).
 18. **Trusted proxies**: not configured in Phase 1 � ootstrap/app.php cannot read env/config reliably (the middleware callback runs before configuration is cached). Loop-safe ForceHttps honours X-Forwarded-Proto; the exact 	rustProxies value for the production host is a Phase 6 launch-checklist item.
 19. **Year in copyright**: dynamic server-side (`© {{ now()->year }} ENERGEA`).
 20. **Social links admin UI**: `social_links` remains in SiteSetting (empty array from the preview) but has no admin form field because the handoff defines no shape for social entries; revisit only if real links are supplied.
-21. **Admin UI language**: the Filament panel stays in English (default locale); bilingual *content* is edited through EN/AR tabs. The public site remains fully bilingual.
+21. **Admin UI language**: the Filament panel is bilingual (EN/AR) with a topbar toggle. The choice is stored per browser session (`admin_locale`) and, for signed-in users, persisted in the new `users.locale` column; resolution order is session → user → default locale. Guests can switch from the login screen. Arabic enables Filament's built-in RTL layout and bundled translations; no extra webfont is loaded (system font stack).
 22. **Client names**: the preview stores client names in English only; Arabic names are optional in the admin, and the public site shows the same name in both locales.
 23. **Blade icon component name**: the shared SVG component is `<x-ui-icon>` (file `components/ui-icon.blade.php`). `<x-icon>` is reserved by blade-ui-kit (Filament dependency) and would raise `SvgNotFound`; the rendered markup and `ui-icon` CSS class are unchanged from the preview.
 24. **Contact form action deferred to Phase 5**: the `/contact` page renders the full form (fields, captcha panel, attachment control) with `@csrf` but no `action`, and only a GET route exists. Phase 5 adds the POST route, validation, uploads, mail and spam verification.

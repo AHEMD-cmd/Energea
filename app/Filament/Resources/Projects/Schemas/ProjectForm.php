@@ -21,13 +21,15 @@ class ProjectForm
     {
         return $schema
             ->components([
-                Section::make('Project')
+                Section::make(__('admin.sections.project'))
                     ->schema([
                         TextInput::make('slug')
+                            ->label(__('admin.fields.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         TextInput::make('year')
+                            ->label(__('admin.fields.year'))
                             ->required()
                             ->maxLength(10),
                         Select::make('sector_id')
@@ -35,30 +37,32 @@ class ProjectForm
                             ->getOptionLabelFromRecordUsing(fn (Sector $record): string => $record->translate('title'))
                             ->searchable()
                             ->preload()
-                            ->label('Sector'),
+                            ->label(__('admin.fields.sector')),
                         TextInput::make('sort_order')
+                            ->label(__('admin.fields.sort_order'))
                             ->numeric()
                             ->default(0)
                             ->required(),
                         Toggle::make('is_published')
+                            ->label(__('admin.fields.is_published'))
                             ->default(true),
                         Placeholder::make('current_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function (?Project $record) {
                                 $image = $record?->image;
 
                                 return view('filament.forms.image-preview', [
                                     'url' => filled($image) ? Media::url($image) : null,
                                     'isCustom' => filled($image),
-                                    'title' => 'Project image',
-                                    'hint' => 'Landscape image recommended.',
+                                    'title' => __('admin.titles.project_image'),
+                                    'hint' => __('admin.descriptions.image_hint_landscape'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('image_upload')
-                            ->label('Upload image')
-                            ->helperText('Upload a new image to replace the current one.')
+                            ->label(__('admin.fields.upload_image'))
+                            ->helperText(__('admin.descriptions.upload_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('projects')
@@ -69,16 +73,18 @@ class ProjectForm
                     ])
                     ->columnSpanFull(),
                 Bilingual::tabs([
-                    'title' => Bilingual::text('title', 'Title', required: true),
-                    'location' => Bilingual::text('location', 'Location', required: true),
-                    'scope' => Bilingual::textarea('scope', 'Scope', required: true, rows: 3),
-                    'systems' => Bilingual::textarea('systems', 'Systems', rows: 3),
+                    'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                    'location' => Bilingual::text('location', __('admin.fields.location'), required: true),
+                    'scope' => Bilingual::textarea('scope', __('admin.fields.scope'), required: true, rows: 3),
+                    'systems' => Bilingual::textarea('systems', __('admin.fields.systems'), rows: 3),
                 ]),
-                Section::make('SEO')
+                Section::make(__('admin.sections.seo'))
                     ->schema([
                         TextInput::make('seo_title')
+                            ->label(__('admin.fields.seo_title'))
                             ->maxLength(255),
                         Textarea::make('seo_description')
+                            ->label(__('admin.fields.seo_description'))
                             ->rows(3)
                             ->maxLength(500),
                     ])

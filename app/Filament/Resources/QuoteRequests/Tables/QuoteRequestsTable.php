@@ -23,36 +23,41 @@ class QuoteRequestsTable
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->label('Received'),
+                    ->label(__('admin.fields.received')),
                 TextColumn::make('name')
+                    ->label(__('admin.fields.name'))
                     ->searchable(),
                 TextColumn::make('company')
+                    ->label(__('admin.fields.company'))
                     ->searchable()
-                    ->placeholder('—'),
+                    ->placeholder(__('admin.placeholders.none')),
                 TextColumn::make('email')
+                    ->label(__('admin.fields.email'))
                     ->searchable()
                     ->copyable(),
                 TextColumn::make('service.title.en')
-                    ->label('Service')
-                    ->placeholder('—'),
+                    ->label(__('admin.fields.service'))
+                    ->placeholder(__('admin.placeholders.none')),
                 TextColumn::make('location_key')
-                    ->label('Location')
+                    ->label(__('admin.fields.location'))
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 SelectColumn::make('status')
+                    ->label(__('admin.fields.status'))
                     ->options(fn (): array => collect(QuoteRequestStatus::cases())
                         ->mapWithKeys(fn (QuoteRequestStatus $status): array => [$status->value => $status->label()])
                         ->all()),
                 IconColumn::make('mail_sent_at')
-                    ->label('Emailed')
+                    ->label(__('admin.fields.emailed'))
                     ->boolean(),
             ])
             ->filters([
                 SelectFilter::make('status')
+                    ->label(__('admin.fields.status'))
                     ->options(fn (): array => collect(QuoteRequestStatus::cases())
                         ->mapWithKeys(fn (QuoteRequestStatus $status): array => [$status->value => $status->label()])
                         ->all()),
                 SelectFilter::make('service_id')
-                    ->label('Service')
+                    ->label(__('admin.fields.service'))
                     ->options(fn (): array => Service::query()
                         ->orderBy('sort_order')
                         ->get()

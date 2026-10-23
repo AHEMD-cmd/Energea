@@ -19,18 +19,21 @@ class ClientsTable
             ->reorderable('sort_order')
             ->columns([
                 ImageColumn::make('logo')
+                    ->label(__('admin.fields.logo'))
                     ->disk('public')
                     ->square(),
                 TextColumn::make('logo_code')
-                    ->label('Code')
+                    ->label(__('admin.fields.logo_code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name.en')
-                    ->label('Name')
+                    ->label(__('admin.fields.name'))
                     ->searchable(),
                 IconColumn::make('is_published')
+                    ->label(__('admin.fields.is_published'))
                     ->boolean(),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

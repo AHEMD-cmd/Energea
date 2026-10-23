@@ -19,21 +19,24 @@ class ServicesTable
             ->reorderable('sort_order')
             ->columns([
                 ImageColumn::make('image')
+                    ->label(__('admin.fields.image'))
                     ->disk('public')
                     ->square(),
                 TextColumn::make('number')
-                    ->label('#')
+                    ->label(__('admin.fields.number'))
                     ->sortable(),
                 TextColumn::make('title.en')
-                    ->label('Title')
+                    ->label(__('admin.fields.title'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('groups_count')
                     ->counts('groups')
-                    ->label('Groups'),
+                    ->label(__('admin.fields.groups')),
                 IconColumn::make('is_published')
+                    ->label(__('admin.fields.is_published'))
                     ->boolean(),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

@@ -15,40 +15,44 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class GroupsRelationManager extends RelationManager
 {
     protected static string $relationship = 'groups';
 
-    protected static ?string $title = 'Specification groups';
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('admin.titles.specification_groups');
+    }
 
     public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('Group')
+                Section::make(__('admin.sections.group'))
                     ->schema([
                         Bilingual::tabs([
-                            'title' => Bilingual::text('title', 'Group title', required: true),
+                            'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
                         ]),
                         Repeater::make('items')
                             ->relationship('items')
                             ->orderColumn('sort_order')
-                            ->label('Items')
+                            ->label(__('admin.fields.items'))
                             ->schema([
                                 TextInput::make('text.en')
-                                    ->label('English')
+                                    ->label(__('admin.fields.title_en'))
                                     ->required()
                                     ->maxLength(255),
                                 TextInput::make('text.ar')
-                                    ->label('Arabic')
+                                    ->label(__('admin.fields.title_ar'))
                                     ->required()
                                     ->maxLength(255)
                                     ->extraAttributes(['dir' => 'rtl']),
                             ])
                             ->columns(2)
                             ->defaultItems(1)
-                            ->addActionLabel('Add item')
+                            ->addActionLabel(__('admin.actions.add_item'))
                             ->columnSpanFull(),
                     ]),
             ]);
@@ -59,12 +63,13 @@ class GroupsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('title.en')
-                    ->label('Title')
+                    ->label(__('admin.fields.title'))
                     ->searchable(),
                 TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Items'),
+                    ->label(__('admin.fields.items')),
                 TextColumn::make('sort_order')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
             ])
             ->filters([

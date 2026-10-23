@@ -22,38 +22,42 @@ class ServiceForm
     {
         return $schema
             ->components([
-                Section::make('Service')
+                Section::make(__('admin.sections.service'))
                     ->schema([
                         TextInput::make('slug')
+                            ->label(__('admin.fields.slug'))
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true),
                         TextInput::make('number')
+                            ->label(__('admin.fields.number'))
                             ->required()
                             ->maxLength(10),
                         TextInput::make('sort_order')
+                            ->label(__('admin.fields.sort_order'))
                             ->numeric()
                             ->default(0)
                             ->required(),
                         Toggle::make('is_published')
+                            ->label(__('admin.fields.is_published'))
                             ->default(true),
                         Placeholder::make('current_image')
-                            ->label('Current image')
+                            ->label(__('admin.fields.current_image'))
                             ->content(function (?Service $record) {
                                 $image = $record?->image;
 
                                 return view('filament.forms.image-preview', [
                                     'url' => filled($image) ? Media::url($image) : null,
                                     'isCustom' => filled($image),
-                                    'title' => 'Service image',
-                                    'hint' => 'Landscape image recommended.',
+                                    'title' => __('admin.titles.service_image'),
+                                    'hint' => __('admin.descriptions.image_hint_landscape'),
                                     'variant' => 'landscape',
                                 ]);
                             })
                             ->columnSpanFull(),
                         FileUpload::make('image_upload')
-                            ->label('Upload image')
-                            ->helperText('Upload a new image to replace the current one.')
+                            ->label(__('admin.fields.upload_image'))
+                            ->helperText(__('admin.descriptions.upload_replace'))
                             ->image()
                             ->disk('public')
                             ->directory('services')
@@ -64,38 +68,40 @@ class ServiceForm
                     ])
                     ->columnSpanFull(),
                 Bilingual::tabs([
-                    'title' => Bilingual::text('title', 'Title', required: true),
-                    'type' => Bilingual::text('type', 'Type', required: true),
-                    'summary' => Bilingual::textarea('summary', 'Summary', required: true, rows: 3),
-                    'overview' => Bilingual::textarea('overview', 'Overview', required: true, rows: 6),
+                    'title' => Bilingual::text('title', __('admin.fields.title'), required: true),
+                    'type' => Bilingual::text('type', __('admin.fields.type'), required: true),
+                    'summary' => Bilingual::textarea('summary', __('admin.fields.summary'), required: true, rows: 3),
+                    'overview' => Bilingual::textarea('overview', __('admin.fields.overview'), required: true, rows: 6),
                 ]),
                 Tabs::make('process')
                     ->tabs([
-                        Tab::make('Steps & facts (English)')
+                        Tab::make(__('admin.sections.steps_facts_en'))
                             ->schema([
                                 TagsInput::make('steps.en')
-                                    ->label('Steps')
-                                    ->helperText('Leave empty to use the default process steps on the website.'),
+                                    ->label(__('admin.fields.steps'))
+                                    ->helperText(__('admin.descriptions.steps_helper')),
                                 TagsInput::make('facts.en')
-                                    ->label('Facts')
-                                    ->helperText('Leave empty to use the default facts on the website.'),
+                                    ->label(__('admin.fields.facts'))
+                                    ->helperText(__('admin.descriptions.facts_helper')),
                             ]),
-                        Tab::make('Steps & facts (العربية)')
+                        Tab::make(__('admin.sections.steps_facts_ar'))
                             ->schema([
                                 TagsInput::make('steps.ar')
-                                    ->label('Steps')
+                                    ->label(__('admin.fields.steps'))
                                     ->extraAttributes(['dir' => 'rtl']),
                                 TagsInput::make('facts.ar')
-                                    ->label('Facts')
+                                    ->label(__('admin.fields.facts'))
                                     ->extraAttributes(['dir' => 'rtl']),
                             ]),
                     ])
                     ->columnSpanFull(),
-                Section::make('SEO')
+                Section::make(__('admin.sections.seo'))
                     ->schema([
                         TextInput::make('seo_title')
+                            ->label(__('admin.fields.seo_title'))
                             ->maxLength(255),
                         Textarea::make('seo_description')
+                            ->label(__('admin.fields.seo_description'))
                             ->rows(3)
                             ->maxLength(500),
                     ])

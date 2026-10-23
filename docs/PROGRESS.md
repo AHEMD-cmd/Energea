@@ -9,7 +9,7 @@
 | 2 — Schema, models, import | ✅ Complete — 11 migrations, 10 models + enums/trait, 10 factories, `energea:import-preview` (9 services / 14 groups / 60 items / 8 sectors / 10 projects / 14 parties / 38 clients / 18 certificates) verified against MySQL and green in tests |
 | 3 — Filament panel | ✅ Complete — Filament 5 resources (services + groups/items, projects + parties, sectors, clients, certificates), quote-request inbox, site-settings page, admin gate + `energea:make-admin`; 17 tests green; panel smoke-tested in browser |
 | 4 — Blade conversion, routes, i18n | ✅ Complete — EN/AR layouts + partials, all 9 public pages, legacy 301 redirects, trimmed `main.js`, localized 404; 23 tests green; smoke-tested in both locales |
-| 5 — Quote form, uploads, mail | ⏳ Pending |
+| 5 - Quote form, uploads, mail | Complete - Contact POST with FormRequest validation, honeypot + math captcha (Turnstile when configured) + min-fill-time + throttle; private-disk attachments (size/MIME limits, optional ClamAV scan, admin-only download route); QuoteRequest persisted then mailed to quote_recipients with delivery state (mail_sent_at / mail_error) surfaced in the inbox; localized success/error feedback; 45 tests green |
 | 6 — SEO, performance, security, backup, docs | ⏳ Pending |
 | 7 — Verification & final report | ⏳ Pending |
 
@@ -67,6 +67,23 @@
 - Projects listing paginates 5/page (`config('quote.projects_per_page')`) with a custom `partials.pagination` (RTL-aware chevrons); services index features the last card when the count `% 3 === 1`, matching the preview.
 - Tests: `PublicPagesTest` replaces the skeleton `ExampleTest` — root/index redirects, all public pages in both locales, Arabic `dir="rtl"` + localized copy, 5-per-page pagination, unpublished records hidden, legacy URL redirects, localized 404. Full suite 23 tests / 188 assertions green; Pint clean; browser smoke test passed for home, services index/show, projects index/show, clients (38 logos), certificates (18) and contact (both locales, RTL verified).
 
+## Key decisions (Phase 5)
+
+- `ContactController@store` runs behind `QuoteRequestStoreRequest`; spam layers are a global route `throttle:10,1`, per-IP rate limiters (minute + hour from `config/quote.php`), honeypot `website` field, session math captcha (refresh endpoint `contact.captcha`, `throttle:30,1`) and a min-fill-time token (`quote_form_ts`, ~3 s).
+- Attachments are stored on the private `local` disk under `attachments/` with a UUID name; original name kept separately for display. Size/extension limits come from `config/quote.php`; `ClamavScanner` runs only when `quote.clamav.enabled`.
+- Attachments are never public: downloads go through `admin.quote-requests.attachment` (`QuoteRequestAttachmentController`), which requires an authenticated admin and `Storage::disk('local')`.
+- The quote is persisted first (status `new`), then `QuoteRequestSubmitted` is mailed synchronously to valid `quote_recipients` (falling back to `hello@energea.me`). Success stamps `mail_sent_at`; failures are logged and stored (truncated) in `mail_error` so the read-only inbox shows delivery state.
+- Responses support both normal posts (redirect back with `quote_status`/`quote_message` and old input, localized via `contact.messages.*`) and JSON (`status`/`message`, 422 for rejected spam).
+- Tests: `QuoteRequestTest` covers validation, captcha/honeypot/timing rejection, private attachment storage + admin download gate, mail dispatch and delivery-state persistence.
+## Key decisions (Admin localization)
+
+- The Filament panel follows the same two locales as the site, but with its own session key (`admin_locale`) so switching the dashboard never changes the public site (and vice versa).
+- Any authenticated user can pick EN/AR from a topbar dropdown (also rendered on the login page for guests); the choice is stored in `admin_locale` and, for logged-in users, persisted to `users.locale` (new nullable column).
+- `SetAdminLocale` resolves session → user preference → `config('energea.default_locale')`, validates against `config('energea.locales')` and calls `app()->setLocale()`. It is registered as Filament **persistent** middleware so Livewire requests keep the locale.
+- `POST /admin/locale/{locale}` (`LocaleController`) validates the locale (404 otherwise), updates session + user and redirects back; registered once through the panel's non-authenticated routes so it also works from the login screen.
+- Filament's bundled Arabic translations drive RTL (`filament-panels::layout.direction`); no extra webfont was added — Arabic renders with the OS system font stack.
+- Every custom admin string lives in `lang/{en,ar}/admin.php` (navigation groups, resource/page titles, section headings, field labels, helper texts, action labels, notifications, enum labels, placeholders). Enum labels (`PartyType`, `QuoteRequestStatus`) read from the same file.
+- Tests: `AdminLocalizationTest` covers the default LTR/English panel, guest switching to Arabic (`dir="rtl"`), a user-level Arabic preference, persistence of the choice to `users.locale`, and rejection of unsupported locales. Full suite 50 tests green.
 ## Next step
 
-Phase 5: quote form POST handling, attachment upload + ClamAV hook, mail delivery to `quote_recipients`, spam layers (honeypot + math captcha verify + min-fill-time + throttle) wired to the Filament quote inbox, localized success/error feedback.
+Phase 6: SEO audit (sitemap/robots/structured data/OG), performance (image variants, caching, query checks), security hardening (CSP decision, Turnstile server-side verification, trusted proxies), backup schedule verification, and documentation/launch checklist updates.
