@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'locale',
@@ -39,6 +40,15 @@ class QuoteRequest extends Model
             'status' => QuoteRequestStatus::class,
             'mail_sent_at' => 'datetime',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (QuoteRequest $quoteRequest): void {
+            if ($quoteRequest->attachment_path) {
+                Storage::disk('local')->delete($quoteRequest->attachment_path);
+            }
+        });
     }
 
     /**

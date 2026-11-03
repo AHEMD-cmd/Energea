@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\QuoteRequests\Pages\ListQuoteRequests;
 use App\Mail\QuoteRequestSubmitted;
 use App\Models\QuoteRequest;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -245,6 +248,21 @@ class QuoteRequestTest extends TestCase
             ->get(route('admin.quote-requests.attachment', $quote))
             ->assertOk()
             ->assertDownload('specification.pdf');
+    }
+
+    #[Test]
+    public function admins_can_delete_a_quote_request_and_its_attachment(): void
+    {
+        $quote = $this->quoteWithAttachment();
+
+        $this->actingAs(User::factory()->admin()->create());
+
+        Livewire::test(ListQuoteRequests::class)
+            ->callTableAction(DeleteAction::class, $quote)
+            ->assertHasNoActionErrors();
+
+        $this->assertDatabaseMissing('quote_requests', ['id' => $quote->id]);
+        Storage::disk('local')->assertMissing($quote->attachment_path);
     }
 
     private function quoteWithAttachment(): QuoteRequest
