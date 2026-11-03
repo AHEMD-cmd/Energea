@@ -83,6 +83,30 @@ class QuoteRequestTest extends TestCase
     }
 
     #[Test]
+    public function a_mail_failure_is_recorded_without_failing_the_request(): void
+    {
+        Mail::shouldReceive('to')->once()->andThrow(new \RuntimeException('SMTP connection timed out'));
+
+        $this->seedDependencies();
+
+        $timestamp = now()->subSeconds(10)->timestamp;
+
+        $this->withSession([
+            'quote_form_ts' => $timestamp,
+            'quote_captcha_total' => 7,
+        ]);
+
+        $this->postJson('/en/contact', $this->payload($timestamp, 7))
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $quote = QuoteRequest::query()->firstOrFail();
+
+        $this->assertNull($quote->mail_sent_at);
+        $this->assertStringContainsString('SMTP connection timed out', $quote->mail_error);
+    }
+
+    #[Test]
     public function a_submission_without_the_json_header_redirects_back_to_the_form(): void
     {
         Mail::fake();
