@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\QuoteRequests\Pages\ListQuoteRequests;
 use App\Mail\QuoteRequestSubmitted;
 use App\Models\QuoteRequest;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\User;
+use Filament\Actions\DeleteAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -83,6 +86,30 @@ class QuoteRequestTest extends TestCase
     }
 
     #[Test]
+    public function a_mail_failure_is_recorded_without_failing_the_request(): void
+    {
+        Mail::shouldReceive('to')->once()->andThrow(new \RuntimeException('SMTP connection timed out'));
+
+        $this->seedDependencies();
+
+        $timestamp = now()->subSeconds(10)->timestamp;
+
+        $this->withSession([
+            'quote_form_ts' => $timestamp,
+            'quote_captcha_total' => 7,
+        ]);
+
+        $this->postJson('/en/contact', $this->payload($timestamp, 7))
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $quote = QuoteRequest::query()->firstOrFail();
+
+        $this->assertNull($quote->mail_sent_at);
+        $this->assertStringContainsString('SMTP connection timed out', $quote->mail_error);
+    }
+
+    #[Test]
     public function a_submission_without_the_json_header_redirects_back_to_the_form(): void
     {
         Mail::fake();
@@ -116,6 +143,50 @@ class QuoteRequestTest extends TestCase
         ]);
 
         $this->postJson('/en/contact', $this->payload($timestamp, 7))
+            ->assertStatus(422)
+            ->assertJson([
+                'status' => 'error',
+                'key' => 'too_fast',
+            ]);
+
+        $this->assertDatabaseCount(QuoteRequest::class, 0);
+    }
+
+    #[Test]
+    public function a_form_from_an_earlier_page_load_is_still_accepted(): void
+    {
+        Mail::fake();
+
+        $this->seedDependencies();
+
+        $oldTimestamp = now()->subSeconds(10)->timestamp;
+        $newTimestamp = now()->timestamp;
+
+        $this->withSession([
+            'quote_form_ts' => [$oldTimestamp, $newTimestamp],
+            'quote_captcha_total' => 7,
+        ]);
+
+        $this->postJson('/en/contact', $this->payload($oldTimestamp, 7))
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $this->assertDatabaseCount(QuoteRequest::class, 1);
+    }
+
+    #[Test]
+    public function a_form_timestamp_that_was_not_issued_by_the_server_is_rejected(): void
+    {
+        $this->seedDependencies();
+
+        $issuedTimestamp = now()->subSeconds(10)->timestamp;
+
+        $this->withSession([
+            'quote_form_ts' => [$issuedTimestamp + 1],
+            'quote_captcha_total' => 7,
+        ]);
+
+        $this->postJson('/en/contact', $this->payload($issuedTimestamp, 7))
             ->assertStatus(422)
             ->assertJson([
                 'status' => 'error',
@@ -177,6 +248,21 @@ class QuoteRequestTest extends TestCase
             ->get(route('admin.quote-requests.attachment', $quote))
             ->assertOk()
             ->assertDownload('specification.pdf');
+    }
+
+    #[Test]
+    public function admins_can_delete_a_quote_request_and_its_attachment(): void
+    {
+        $quote = $this->quoteWithAttachment();
+
+        $this->actingAs(User::factory()->admin()->create());
+
+        Livewire::test(ListQuoteRequests::class)
+            ->callTableAction(DeleteAction::class, $quote)
+            ->assertHasNoActionErrors();
+
+        $this->assertDatabaseMissing('quote_requests', ['id' => $quote->id]);
+        Storage::disk('local')->assertMissing($quote->attachment_path);
     }
 
     private function quoteWithAttachment(): QuoteRequest

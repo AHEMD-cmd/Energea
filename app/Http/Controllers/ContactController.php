@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Enums\QuoteRequestStatus;
 use App\Http\Requests\QuoteRequestStoreRequest;
 use App\Mail\QuoteRequestSubmitted;
+use App\Models\PageContent;
 use App\Models\QuoteRequest;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Services\ClamavScanner;
+use App\Support\ContactContent;
+use App\Support\Media;
 use App\Support\Seo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -17,10 +20,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
-use App\Models\PageContent;
-use App\Support\ContactContent;
-use App\Support\Media;
-
 
 class ContactController extends Controller
 {
@@ -33,12 +32,17 @@ class ContactController extends Controller
 
         $content = PageContent::localized(ContactContent::PAGE);
 
-        session(['quote_form_ts' => now()->timestamp]);
+        $formTs = now()->timestamp;
+        $issuedTimestamps = $this->issuedFormTimestamps();
+        $issuedTimestamps[] = $formTs;
+
+        session(['quote_form_ts' => array_slice($issuedTimestamps, -5)]);
 
         return view('pages.contact', [
             'services' => $services,
             'settings' => SiteSetting::current(),
             'contactPage' => $content,
+            'formTs' => $formTs,
             'heroImage' => Media::url($content['hero']['image'], 'assets/images/field-electrical-testing.jpeg'),
             'page' => 'contact',
             'seo' => Seo::make(__('contact.seo_title'), __('contact.seo_description')),
@@ -67,8 +71,8 @@ class ContactController extends Controller
             return $this->errorResponse($request, 'too_fast');
         }
 
-        $sessionTs = session('quote_form_ts');
-        if (is_numeric($sessionTs) && (int) $request->input('form_ts') !== (int) $sessionTs) {
+        $issuedTimestamps = $this->issuedFormTimestamps();
+        if ($issuedTimestamps !== [] && ! in_array((int) $request->input('form_ts'), $issuedTimestamps, true)) {
             return $this->errorResponse($request, 'too_fast');
         }
 
@@ -130,6 +134,7 @@ class ContactController extends Controller
             $recipients = ['hello@energea.me'];
         }
 
+<<<<<<< HEAD
     log::info('Quote request email recipients', ['recipients' => $recipients]);
 
         try {
@@ -139,6 +144,21 @@ class ContactController extends Controller
             Log::error('Quote request email failed', ['quote_id' => $quote->id, 'error' => $exception->getMessage()]);
             $quote->update(['mail_error' => Str::limit($exception->getMessage(), 1000)]);
         }
+=======
+        // The visitor should not wait on the SMTP server. The notification is
+        // sent after the response has been flushed, so a slow or unreachable
+        // mail host can never stall the form (the outcome is still recorded on
+        // the quote request for the admin panel).
+        defer(function () use ($quote, $recipients): void {
+            try {
+                Mail::to($recipients)->send(new QuoteRequestSubmitted($quote));
+                $quote->update(['mail_sent_at' => now(), 'mail_error' => null]);
+            } catch (\Throwable $exception) {
+                Log::error('Quote request email failed', ['quote_id' => $quote->id, 'error' => $exception->getMessage()]);
+                $quote->update(['mail_error' => Str::limit($exception->getMessage(), 1000)]);
+            }
+        });
+>>>>>>> 97ddc69be131a1e2064bb9723652fecb9f182c1c
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -163,6 +183,20 @@ class ContactController extends Controller
         return response()->json([
             'question' => __('contact.captcha_question', ['first' => $first, 'second' => $second]),
         ]);
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    private function issuedFormTimestamps(): array
+    {
+        $timestamps = session('quote_form_ts', []);
+
+        if (! is_array($timestamps)) {
+            $timestamps = is_numeric($timestamps) ? [$timestamps] : [];
+        }
+
+        return array_values(array_map('intval', $timestamps));
     }
 
     private function errorResponse(QuoteRequestStoreRequest $request, string $key): RedirectResponse|JsonResponse

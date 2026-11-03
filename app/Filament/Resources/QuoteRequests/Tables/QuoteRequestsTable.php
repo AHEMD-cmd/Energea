@@ -5,6 +5,7 @@ namespace App\Filament\Resources\QuoteRequests\Tables;
 use App\Enums\QuoteRequestStatus;
 use App\Models\Service;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
@@ -67,6 +68,8 @@ class QuoteRequestsTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

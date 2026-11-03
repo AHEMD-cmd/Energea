@@ -44,7 +44,7 @@
                         data-message-error="{{ __('contact.messages.error') }}"
                         data-message-captcha="{{ __('contact.messages.invalid_captcha') }}">
                         @csrf
-                        <input type="hidden" name="form_ts" id="formTs" value="{{ session('quote_form_ts') ?? time() }}">
+                        <input type="hidden" name="form_ts" id="formTs" value="{{ $formTs }}">
                         <input type="hidden" name="locale" value="{{ app()->getLocale() }}">
                         @if (session('quote_status'))
                             <div class="alert {{ session('quote_status') === 'success' ? 'alert-success' : 'alert-danger' }} form-status" role="status" aria-live="polite">
