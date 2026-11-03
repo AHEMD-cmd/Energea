@@ -130,6 +130,8 @@ class ContactController extends Controller
             $recipients = ['hello@energea.me'];
         }
 
+    log::info('Quote request email recipients', ['recipients' => $recipients]);
+
         try {
             Mail::to($recipients)->send(new QuoteRequestSubmitted($quote));
             $quote->update(['mail_sent_at' => now(), 'mail_error' => null]);

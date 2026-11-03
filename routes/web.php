@@ -10,6 +10,9 @@ use App\Http\Controllers\QuoteRequestAttachmentController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
 
 Route::get('/', [HomeController::class, 'root'])->name('root');
 Route::get('/index.html', [RedirectController::class, 'rootIndex'])->name('legacy.root-index');
@@ -43,3 +46,30 @@ Route::prefix('{locale}')
             ->whereIn('page', ['about', 'services', 'clients', 'certificates', 'contact'])
             ->name('legacy.page');
     });
+
+
+
+Route::get('/test-mail', function () {
+    try {
+        $sent = Mail::raw('This is a test email from Laravel.', function ($message) {
+            $message->to('you@example.com')
+                    ->subject('Test Mail');
+        });
+
+        if ($sent) {
+            return response()->json([
+                'status'     => 'sent',
+                'message_id' => $sent->getMessageId(),
+            ]);
+        }
+
+        return response()->json(['status' => 'not sent'], 500);
+    } catch (\Throwable $e) {
+        Log::error('Test mail failed: ' . $e->getMessage());
+
+        return response()->json([
+            'status' => 'failed',
+            'error'  => $e->getMessage(),
+        ], 500);
+    }
+});
