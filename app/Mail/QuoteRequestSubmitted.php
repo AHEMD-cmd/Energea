@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\QuoteRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -19,8 +20,13 @@ class QuoteRequestSubmitted extends Mailable
 
     public function envelope(): Envelope
     {
+        $replyTo = filter_var($this->quoteRequest->email, FILTER_VALIDATE_EMAIL)
+            ? [new Address($this->quoteRequest->email, $this->quoteRequest->name)]
+            : [];
+
         return new Envelope(
             subject: 'New quote request from '.$this->quoteRequest->name.' — Energea',
+            replyTo: $replyTo,
         );
     }
 
@@ -28,6 +34,7 @@ class QuoteRequestSubmitted extends Mailable
     {
         return new Content(
             view: 'emails.quote-request',
+            text: 'emails.quote-request-text',
             with: ['quote' => $this->quoteRequest],
         );
     }
