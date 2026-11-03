@@ -126,6 +126,50 @@ class QuoteRequestTest extends TestCase
     }
 
     #[Test]
+    public function a_form_from_an_earlier_page_load_is_still_accepted(): void
+    {
+        Mail::fake();
+
+        $this->seedDependencies();
+
+        $oldTimestamp = now()->subSeconds(10)->timestamp;
+        $newTimestamp = now()->timestamp;
+
+        $this->withSession([
+            'quote_form_ts' => [$oldTimestamp, $newTimestamp],
+            'quote_captcha_total' => 7,
+        ]);
+
+        $this->postJson('/en/contact', $this->payload($oldTimestamp, 7))
+            ->assertOk()
+            ->assertJson(['status' => 'ok']);
+
+        $this->assertDatabaseCount(QuoteRequest::class, 1);
+    }
+
+    #[Test]
+    public function a_form_timestamp_that_was_not_issued_by_the_server_is_rejected(): void
+    {
+        $this->seedDependencies();
+
+        $issuedTimestamp = now()->subSeconds(10)->timestamp;
+
+        $this->withSession([
+            'quote_form_ts' => [$issuedTimestamp + 1],
+            'quote_captcha_total' => 7,
+        ]);
+
+        $this->postJson('/en/contact', $this->payload($issuedTimestamp, 7))
+            ->assertStatus(422)
+            ->assertJson([
+                'status' => 'error',
+                'key' => 'too_fast',
+            ]);
+
+        $this->assertDatabaseCount(QuoteRequest::class, 0);
+    }
+
+    #[Test]
     public function an_attachment_is_stored_on_the_private_disk_and_never_on_the_public_one(): void
     {
         Mail::fake();
