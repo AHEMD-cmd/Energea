@@ -88,7 +88,6 @@ class ManageHomePage extends Page
                             ->label(__('admin.fields.current_image'))
                             ->content(function () {
                                 $image = PageContent::for(HomeContent::PAGE)['hero']['image'];
-
                                 return view('filament.forms.image-preview', [
                                     'url' => Media::url($image, 'assets/images/field-panel-desktop.jpeg'),
                                     'isCustom' => is_string($image) && $image !== '',
@@ -106,10 +105,10 @@ class ManageHomePage extends Page
                             ->visibility('public')
                             ->maxSize(5120)
                             ->columnSpanFull(),
-                        Toggle::make('hero_image_reset')
-                            ->label(__('admin.fields.use_default_hero_image'))
-                            ->helperText(__('admin.descriptions.remove_custom_image'))
-                            ->columnSpanFull(),
+                        // Toggle::make('hero_image_reset')
+                        //     ->label(__('admin.fields.use_default_hero_image'))
+                        //     ->helperText(__('admin.descriptions.remove_custom_image'))
+                        //     ->columnSpanFull(),
                     ])
                     ->collapsible(),
 

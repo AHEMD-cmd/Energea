@@ -101,10 +101,10 @@ class ManageAboutPage extends Page
                             ->visibility('public')
                             ->maxSize(5120)
                             ->columnSpanFull(),
-                        Toggle::make('hero_image_reset')
-                            ->label(__('admin.fields.use_default_hero_image'))
-                            ->helperText(__('admin.descriptions.remove_custom_image'))
-                            ->columnSpanFull(),
+                        // Toggle::make('hero_image_reset')
+                        //     ->label(__('admin.fields.use_default_hero_image'))
+                        //     ->helperText(__('admin.descriptions.remove_custom_image'))
+                        //     ->columnSpanFull(),
                     ])
                     ->collapsible(),
                 Section::make(__('admin.sections.snapshot'))

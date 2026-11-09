@@ -68,7 +68,6 @@ class QuoteRequestsTable
             ])
             ->recordActions([
                 ViewAction::make(),
-                
                 DeleteAction::make(),
             ])
             ->toolbarActions([
