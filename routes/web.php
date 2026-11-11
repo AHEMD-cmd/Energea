@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 Route::get('/', [HomeController::class, 'root'])->name('root');
 Route::get('/index.html', [RedirectController::class, 'rootIndex'])->name('legacy.root-index');
 
-Route::get('/'.config('energea.admin_path').'/quote-requests/{quoteRequest}/attachment', [QuoteRequestAttachmentController::class, 'download'])
+Route::get('/' . config('energea.admin_path') . '/quote-requests/{quoteRequest}/attachment', [QuoteRequestAttachmentController::class, 'download'])
     ->name('admin.quote-requests.attachment');
 
 Route::prefix('{locale}')
@@ -53,7 +53,7 @@ Route::get('/test-mail', function () {
     try {
         $sent = Mail::raw('This is a test email from Laravel.', function ($message) {
             $message->to('you@example.com')
-                    ->subject('Test Mail');
+                ->subject('Test Mail');
         });
 
         if ($sent) {
@@ -72,4 +72,25 @@ Route::get('/test-mail', function () {
             'error'  => $e->getMessage(),
         ], 500);
     }
+});
+
+Route::get('/create-link', function () {
+
+    $target = storage_path('app/public');
+    $link = public_path('storage');
+
+    // Create the target directory if it doesn't exist
+    if (!is_dir($target)) {
+        mkdir($target, 0755, true);
+    }
+
+    if (file_exists($link) || is_link($link)) {
+        return 'Storage link already exists.';
+    }
+
+    if (symlink($target, $link)) {
+        return 'Storage link created successfully!';
+    }
+
+    return 'Failed to create storage link.';
 });

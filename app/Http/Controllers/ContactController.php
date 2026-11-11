@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use App\Jobs\SendQuoteRequestEmail;
 
 class ContactController extends Controller
 {
@@ -52,8 +53,8 @@ class ContactController extends Controller
     public function store(QuoteRequestStoreRequest $request, ClamavScanner $scanner): RedirectResponse|JsonResponse
     {
         $ip = $request->ip();
-        $keyMinute = 'quote:minute:'.$ip;
-        $keyHour = 'quote:hour:'.$ip;
+        $keyMinute = 'quote:minute:' . $ip;
+        $keyHour = 'quote:hour:' . $ip;
 
         if (RateLimiter::tooManyAttempts($keyMinute, config('quote.throttle.per_minute')) || RateLimiter::tooManyAttempts($keyHour, config('quote.throttle.per_hour'))) {
             return $this->errorResponse($request, 'rate_limited');
@@ -107,7 +108,7 @@ class ContactController extends Controller
                 $extension = $file->extension() ?: 'bin';
             }
 
-            $storedName = Str::uuid().'.'.$extension;
+            $storedName = Str::uuid() . '.' . $extension;
             $attachmentPath = $file->storeAs('attachments', $storedName, 'local');
         }
 
@@ -127,23 +128,17 @@ class ContactController extends Controller
         ]);
 
         $recipients = collect(data_get(SiteSetting::current(), 'quote_recipients', ['hello@energea.me']))
-            ->filter(fn ($email) => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL))
+            ->filter(fn($email) => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL))
             ->all();
 
         if (empty($recipients)) {
             $recipients = ['hello@energea.me'];
         }
 
-    log::info('Quote request email recipients', ['recipients' => $recipients]);
+        Log::info('Quote request email recipients', ['recipients' => $recipients]);
 
-        try {
-            Mail::to($recipients)->send(new QuoteRequestSubmitted($quote));
-            $quote->update(['mail_sent_at' => now(), 'mail_error' => null]);
-        } catch (\Throwable $exception) {
-            Log::error('Quote request email failed', ['quote_id' => $quote->id, 'error' => $exception->getMessage()]);
-            $quote->update(['mail_error' => Str::limit($exception->getMessage(), 1000)]);
-        }
-
+        SendQuoteRequestEmail::dispatch($quote->id, $recipients)->afterResponse();
+        
         if ($request->expectsJson()) {
             return response()->json([
                 'status' => 'ok',
@@ -189,13 +184,13 @@ class ContactController extends Controller
             return response()->json([
                 'status' => 'error',
                 'key' => $key,
-                'message' => __('contact.messages.'.$key),
+                'message' => __('contact.messages.' . $key),
             ], 422);
         }
 
         return redirect()->route('contact', ['locale' => app()->getLocale()])
             ->withInput()
             ->with('quote_status', 'error')
-            ->with('quote_message', __('contact.messages.'.$key));
+            ->with('quote_message', __('contact.messages.' . $key));
     }
 }
