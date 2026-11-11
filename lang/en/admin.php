@@ -57,6 +57,7 @@ return [
         'certificates' => 'Certificates page',
         'contact' => 'Contact page',
         'site_settings' => 'Site settings',
+        'change_password' => 'Change password',
         'dashboard' => 'Dashboard',
     ],
 
@@ -87,6 +88,7 @@ return [
         'departments' => 'Departments',
         'offices' => 'Offices',
         'analytics' => 'Analytics',
+        'change_password' => 'Password',
         'delivery' => 'Delivery',
         'request' => 'Request',
         'contact' => 'Contact',
@@ -150,6 +152,9 @@ return [
         'current_logo' => 'Current logo',
         'social_share_image' => 'Social share image',
         'ga4_measurement_id' => 'GA4 measurement ID',
+        'current_password' => 'Current password',
+        'new_password' => 'New password',
+        'confirm_password' => 'Confirm new password',
         'search_console_token' => 'Search Console verification token',
         'code' => 'Code',
         'map_url' => 'Google Maps URL',
@@ -245,6 +250,7 @@ return [
         'image_hint_logo' => 'Logo on a transparent or plain background recommended.',
         'image_hint_certificate' => 'Clear scan or photo of the certificate recommended.',
         'image_hint_cta' => 'Recommended around 492 × 448 px.',
+        'change_password' => 'Enter your current password, then choose a new one.',
     ],
 
     'actions' => [
@@ -257,6 +263,7 @@ return [
         'save_certificates' => 'Save certificates page',
         'save_contact' => 'Save contact page',
         'save_settings' => 'Save settings',
+        'change_password' => 'Change password',
         'add_metric' => 'Add metric',
         'add_card' => 'Add card',
         'add_value' => 'Add value',
@@ -274,6 +281,7 @@ return [
         'certificates_saved' => 'Certificates page saved',
         'contact_saved' => 'Contact page saved',
         'settings_saved' => 'Settings saved',
+        'password_changed' => 'Password changed',
     ],
 
     'enums' => [

@@ -61,22 +61,22 @@ class QuoteRequestInfolist
                             ->openUrlInNewTab(),
                     ])
                     ->columns(2),
-                Section::make(__('admin.sections.delivery'))
-                    ->schema([
-                        TextEntry::make('status')
-                            ->label(__('admin.fields.status'))
-                            ->badge()
-                            ->formatStateUsing(fn (QuoteRequestStatus $state): string => $state->label()),
-                        TextEntry::make('mail_sent_at')
-                            ->label(__('admin.fields.emailed'))
-                            ->dateTime()
-                            ->placeholder(__('admin.placeholders.not_sent')),
-                        TextEntry::make('mail_error')
-                            ->label(__('admin.fields.mail_error'))
-                            ->placeholder(__('admin.placeholders.none'))
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(2),
+                // Section::make(__('admin.sections.delivery'))
+                //     ->schema([
+                //         TextEntry::make('status')
+                //             ->label(__('admin.fields.status'))
+                //             ->badge()
+                //             ->formatStateUsing(fn (QuoteRequestStatus $state): string => $state->label()),
+                //         TextEntry::make('mail_sent_at')
+                //             ->label(__('admin.fields.emailed'))
+                //             ->dateTime()
+                //             ->placeholder(__('admin.placeholders.not_sent')),
+                //         TextEntry::make('mail_error')
+                //             ->label(__('admin.fields.mail_error'))
+                //             ->placeholder(__('admin.placeholders.none'))
+                //             ->columnSpanFull(),
+                //     ])
+                //     ->columns(2),
             ]);
     }
 }

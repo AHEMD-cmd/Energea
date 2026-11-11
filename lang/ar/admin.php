@@ -57,6 +57,7 @@ return [
         'certificates' => 'صفحة الشهادات',
         'contact' => 'صفحة اتصل بنا',
         'site_settings' => 'إعدادات الموقع',
+        'change_password' => 'تغيير كلمة المرور',
         'dashboard' => 'لوحة التحكم',
     ],
 
@@ -87,6 +88,7 @@ return [
         'departments' => 'الأقسام',
         'offices' => 'المكاتب',
         'analytics' => 'التحليلات',
+        'change_password' => 'كلمة المرور',
         'delivery' => 'التسليم',
         'request' => 'الطلب',
         'contact' => 'التواصل',
@@ -150,6 +152,9 @@ return [
         'current_logo' => 'الشعار الحالي',
         'social_share_image' => 'صورة المشاركة الاجتماعية',
         'ga4_measurement_id' => 'معرف GA4',
+        'current_password' => 'كلمة المرور الحالية',
+        'new_password' => 'كلمة المرور الجديدة',
+        'confirm_password' => 'تأكيد كلمة المرور الجديدة',
         'search_console_token' => 'رمز التحقق من Search Console',
         'code' => 'الرمز',
         'map_url' => 'رابط خرائط جوجل',
@@ -245,6 +250,7 @@ return [
         'image_hint_logo' => 'يوصى بشعار على خلفية شفافة أو خلفية بسيطة.',
         'image_hint_certificate' => 'يوصى بمسح ضوئي واضح أو صورة فوتوغرافية للشهادة.',
         'image_hint_cta' => 'يوصى بمقاس يقارب 492 × 448 بكسل.',
+        'change_password' => 'أدخل كلمة المرور الحالية ثم اختر كلمة مرور جديدة.',
     ],
 
     'actions' => [
@@ -257,6 +263,7 @@ return [
         'save_certificates' => 'حفظ صفحة الشهادات',
         'save_contact' => 'حفظ صفحة اتصل بنا',
         'save_settings' => 'حفظ الإعدادات',
+        'change_password' => 'تغيير كلمة المرور',
         'add_metric' => 'إضافة إحصائية',
         'add_card' => 'إضافة بطاقة',
         'add_value' => 'إضافة قيمة',
@@ -274,6 +281,7 @@ return [
         'certificates_saved' => 'تم حفظ صفحة الشهادات',
         'contact_saved' => 'تم حفظ صفحة اتصل بنا',
         'settings_saved' => 'تم حفظ الإعدادات',
+        'password_changed' => 'تم تغيير كلمة المرور',
     ],
 
     'enums' => [
